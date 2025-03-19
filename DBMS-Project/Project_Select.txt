@@ -1,0 +1,7 @@
+--Points table with points wins,etc
+
+select name,matches_played AS MP,wins AS W,draws AS D,losses AS L, goals_for AS GF,goals_against AS GA,goal_difference AS GD, points 
+from points_table p
+left join team t on p.team_id=t.team_id
+--GROUP BY name
+ORDER BY p.points DESC;

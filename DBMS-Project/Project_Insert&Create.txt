@@ -1,0 +1,349 @@
+--CREATE TYPE match_status AS ENUM ('Scheduled', 'Ongoing', 'Completed');
+
+CREATE TABLE Admin (
+    admin_id SERIAL PRIMARY KEY,   -- This means serial number will increase on its own.No need to increment different again and again
+    name VARCHAR(100),
+    email VARCHAR(100) UNIQUE,
+    password VARCHAR(255),
+    role VARCHAR(50),
+    created_at TIMESTAMP DEFAULT NOW()
+);
+
+CREATE TABLE Manager (
+    manager_id SERIAL PRIMARY KEY,
+    name VARCHAR(100),
+    experience INT
+);
+
+CREATE TABLE Team (
+    team_id SERIAL PRIMARY KEY,
+    name VARCHAR(100),
+    country VARCHAR(50),
+    creation_date DATE,
+    manager_id INT UNIQUE,
+    FOREIGN KEY (manager_id) REFERENCES Manager(manager_id)
+);
+
+CREATE TABLE Stadium (
+    stadium_id SERIAL PRIMARY KEY,
+    name VARCHAR(100),
+    location VARCHAR(100),
+    capacity INT,
+    team_id INT,
+    FOREIGN KEY (team_id) REFERENCES Team(team_id)
+);
+
+CREATE TABLE Player (
+    player_id SERIAL PRIMARY KEY,
+    name VARCHAR(100),
+    team_id INT,
+    position VARCHAR(50),
+    dob DATE,
+    nationality VARCHAR(50),
+    jersey_number INT UNIQUE,
+    goals_scored INT DEFAULT 0,
+    assists INT DEFAULT 0,
+    matches_played INT DEFAULT 0,
+    yellow_cards INT DEFAULT 0,
+    red_cards INT DEFAULT 0,
+    FOREIGN KEY (team_id) REFERENCES Team(team_id)
+);
+
+CREATE TABLE Referee (
+    referee_id SERIAL PRIMARY KEY,
+    name VARCHAR(100),
+    nationality VARCHAR(50),
+    experience INT
+);
+
+CREATE TABLE Match (
+    match_id SERIAL PRIMARY KEY,
+    team1_id INT,
+    team2_id INT,
+    stadium_id INT,
+    date DATE,
+    score_team1 INT DEFAULT 0,
+    score_team2 INT DEFAULT 0,
+    winner_id INT NULL,
+    loser_id INT NULL,
+    referee_id INT,
+    --status match_status DEFAULT 'Scheduled',
+    FOREIGN KEY (team1_id) REFERENCES Team(team_id),
+    FOREIGN KEY (team2_id) REFERENCES Team(team_id),
+    FOREIGN KEY (stadium_id) REFERENCES Stadium(stadium_id),
+    FOREIGN KEY (winner_id) REFERENCES Team(team_id) ON DELETE SET NULL,
+    FOREIGN KEY (loser_id) REFERENCES Team(team_id) ON DELETE SET NULL,
+    FOREIGN KEY (referee_id) REFERENCES Referee(referee_id)
+);
+
+CREATE TABLE Points_Table (
+    team_id INT PRIMARY KEY,
+    matches_played INT DEFAULT 0,
+    wins INT DEFAULT 0,
+    losses INT DEFAULT 0,
+    draws INT DEFAULT 0,
+    goals_for INT DEFAULT 0,
+    goals_against INT DEFAULT 0,
+    goal_difference INT DEFAULT 0,
+    points INT DEFAULT 0,
+    FOREIGN KEY (team_id) REFERENCES Team(team_id)
+);
+
+
+
+
+-- Insert Managers
+INSERT INTO Manager (name, experience) VALUES 
+('Enzo Maresca', 5), -- Chelsea
+('Carlo Ancelotti', 25), -- Real Madrid
+('Hansi Flick', 10), -- Barcelona
+('Arne Slot', 7), -- Liverpool
+('Pep Guardiola', 22), -- Manchester City
+('Mikel Arteta', 8), -- Arsenal
+('Simone Inzaghi', 12), -- Inter Milan
+('Vincent Kompany', 15), -- Bayern Munich
+('Thiago Motta', 20), -- Juventus
+('Ruben Amorim', 12); -- Manchester United
+
+-- Insert Teams using TO_DATE for creation_date
+INSERT INTO Team (name, country, creation_date, manager_id) VALUES 
+('Chelsea FC', 'England', TO_DATE('1905-03-10', 'YYYY-MM-DD'), 1),
+('Real Madrid', 'Spain', TO_DATE('1902-03-06', 'YYYY-MM-DD'), 2),
+('Barcelona', 'Spain', TO_DATE('1899-11-29', 'YYYY-MM-DD'), 3),
+('Liverpool', 'England', TO_DATE('1892-06-03', 'YYYY-MM-DD'), 4),
+('Manchester City', 'England', TO_DATE('1880-04-16', 'YYYY-MM-DD'), 5),
+('Arsenal', 'England', TO_DATE('1886-10-01', 'YYYY-MM-DD'), 6),
+('Inter Milan', 'Italy', TO_DATE('1908-03-09', 'YYYY-MM-DD'), 7),
+('Bayern Munich', 'Germany', TO_DATE('1900-02-27', 'YYYY-MM-DD'), 8),
+('Juventus', 'Italy', TO_DATE('1897-11-01', 'YYYY-MM-DD'), 9),
+('Manchester United', 'England', TO_DATE('1878-03-05', 'YYYY-MM-DD'), 10);
+
+
+-- Insert Stadiums
+INSERT INTO Stadium (name, location, capacity, team_id) VALUES 
+('Stamford Bridge', 'London', 40834, 1),
+('Santiago Bernabéu', 'Madrid', 81044, 2),
+('Camp Nou', 'Barcelona', 99354, 3),
+('Anfield', 'Liverpool', 53394, 4),
+('Etihad Stadium', 'Manchester', 53400, 5),
+('Emirates Stadium', 'London', 60704, 6),
+('San Siro', 'Milan', 75000, 7),
+('Allianz Arena', 'Munich', 75024, 8),
+('Allianz Stadium', 'Turin', 41507, 9),
+('Old Trafford', 'Manchester', 74310, 10);
+
+
+
+
+
+
+
+-- Insert Players for Chelsea FC
+INSERT INTO Player (name, team_id, position, dob, nationality, jersey_number, goals_scored, assists, matches_played, yellow_cards, red_cards) VALUES
+('Enzo Fernández', 1, 'Midfielder', TO_DATE('2001-01-17', 'YYYY-MM-DD'), 'Argentina', 8, 5, 10, 30, 3, 0),
+('Nicolas Jackson', 1, 'Forward', TO_DATE('2001-06-20', 'YYYY-MM-DD'), 'Senegal', 15, 12, 6, 32, 5, 0),
+('Levi Colwill', 1, 'Defender', TO_DATE('2003-02-26', 'YYYY-MM-DD'), 'England', 6, 2, 1, 30, 2, 0),
+('Reece James', 1, 'Defender', TO_DATE('1999-12-08', 'YYYY-MM-DD'), 'England', 24, 1, 3, 25, 6, 1),
+('Marc Cucurella', 1, 'Defender', TO_DATE('1998-07-22', 'YYYY-MM-DD'), 'Spain', 3, 2, 5, 28, 4, 0),
+('Christopher Nkunku', 1, 'Forward', TO_DATE('1997-11-14', 'YYYY-MM-DD'), 'France', 18, 9, 4, 26, 3, 0),
+('Malo Gusto', 1, 'Defender', TO_DATE('2003-05-19', 'YYYY-MM-DD'), 'France', 27, 0, 2, 20, 3, 0),
+('Noni Madueke', 1, 'Forward', TO_DATE('2002-03-10', 'YYYY-MM-DD'), 'England', 23, 6, 2, 22, 2, 0),
+('Cole Palmer', 1, 'Midfielder', TO_DATE('2002-05-06', 'YYYY-MM-DD'), 'England', 20, 18, 15, 27, 3, 0),
+('Moises Caicedo', 1, 'Midfielder', TO_DATE('2001-11-02', 'YYYY-MM-DD'), 'Ecuador', 25, 3, 8, 30, 5, 0),
+('Robert Sánchez', 1, 'Goalkeeper', TO_DATE('1997-11-18', 'YYYY-MM-DD'), 'Spain', 1, 0, 0, 30, 1, 0);
+
+-- Insert Players for Real Madrid
+INSERT INTO Player (name, team_id, position, dob, nationality, jersey_number, goals_scored, assists, matches_played, yellow_cards, red_cards) VALUES
+('Vinícius Jr.', 2, 'Forward', TO_DATE('2000-07-12', 'YYYY-MM-DD'), 'Brazil', 20, 18, 10, 34, 4, 0),
+('Jude Bellingham', 2, 'Midfielder', TO_DATE('2003-06-29', 'YYYY-MM-DD'), 'England', 5, 10, 8, 29, 3, 0),
+('Luka Modrić', 2, 'Midfielder', TO_DATE('1985-09-09', 'YYYY-MM-DD'), 'Croatia', 10, 3, 6, 30, 2, 0),
+('Kylian Mbappe', 2, 'Forward', TO_DATE('1998-12-20', 'YYYY-MM-DD'), 'France', 9, 18, 3, 25, 3, 0),
+('Eduardo Camavinga', 2, 'Midfielder', TO_DATE('2002-11-10', 'YYYY-MM-DD'), 'France', 12, 1, 4, 25, 2, 0),
+('Rodrygo', 2, 'Forward', TO_DATE('2001-01-09', 'YYYY-MM-DD'), 'Brazil', 11, 15, 5, 32, 3, 0),
+('Antonio Rüdiger', 2, 'Defender', TO_DATE('1993-03-03', 'YYYY-MM-DD'), 'Germany', 22, 2, 1, 29, 5, 1),
+('Eder Militão', 2, 'Defender', TO_DATE('1998-01-18', 'YYYY-MM-DD'), 'Brazil', 3, 1, 2, 27, 6, 0),
+('Ferland Mendy', 2, 'Defender', TO_DATE('1995-06-08', 'YYYY-MM-DD'), 'France', 23, 0, 2, 26, 3, 0),
+('Dani Carvajal', 2, 'Defender', TO_DATE('1992-01-11', 'YYYY-MM-DD'), 'Spain', 2, 0, 3, 28, 2, 0),
+('Thibaut Courtois', 2, 'Goalkeeper', TO_DATE('1992-05-11', 'YYYY-MM-DD'), 'Belgium', 1, 0, 0, 30, 1, 0);
+
+-- Insert Players for Barcelona
+INSERT INTO Player (name, team_id, position, dob, nationality, jersey_number, goals_scored, assists, matches_played, yellow_cards, red_cards) VALUES
+('Robert Lewandowski', 3, 'Forward', TO_DATE('1988-08-21', 'YYYY-MM-DD'), 'Poland', 9, 25, 5, 31, 2, 0),
+('Pedri', 3, 'Midfielder', TO_DATE('2002-11-25', 'YYYY-MM-DD'), 'Spain', 8, 4, 12, 30, 5, 0),
+('Frenkie de Jong', 3, 'Midfielder', TO_DATE('1997-05-12', 'YYYY-MM-DD'), 'Netherlands', 21, 3, 6, 27, 2, 0),
+('Gavi', 3, 'Midfielder', TO_DATE('2004-08-05', 'YYYY-MM-DD'), 'Spain', 6, 2, 4, 28, 4, 0),
+('Lamine Yamal', 3, 'Forward', TO_DATE('2007-07-13', 'YYYY-MM-DD'), 'Spain', 19, 5, 11, 23, 2, 0),
+('Raphinha', 3, 'Forward', TO_DATE('1996-12-14', 'YYYY-MM-DD'), 'Brazil', 22, 8, 5, 30, 2, 0),
+('Ronald Araújo', 3, 'Defender', TO_DATE('1999-03-07', 'YYYY-MM-DD'), 'Uruguay', 4, 1, 1, 28, 5, 1),
+('Jules Koundé', 3, 'Defender', TO_DATE('1998-11-12', 'YYYY-MM-DD'), 'France', 23, 0, 2, 26, 3, 0),
+('Alejandro Balde', 3, 'Defender', TO_DATE('2003-10-18', 'YYYY-MM-DD'), 'Spain', 3, 0, 2, 25, 4, 0),
+('Andreas Christensen', 3, 'Defender', TO_DATE('1996-04-10', 'YYYY-MM-DD'), 'Denmark', 15, 0, 1, 28, 3, 0),
+('Marc-André ter Stegen', 3, 'Goalkeeper', TO_DATE('1992-04-30', 'YYYY-MM-DD'), 'Germany', 1, 0, 0, 30, 1, 0);
+
+
+
+-- Insert Players for Liverpool FC
+INSERT INTO Player (name, team_id, position, dob, nationality, jersey_number, goals_scored, assists, matches_played, yellow_cards, red_cards) VALUES
+('Mohamed Salah', 4, 'Forward', TO_DATE('1992-06-15', 'YYYY-MM-DD'), 'Egypt', 11, 25, 16, 27, 3, 0),
+('Darwin Núñez', 4, 'Forward', TO_DATE('1999-06-24', 'YYYY-MM-DD'), 'Uruguay', 9, 10, 5, 26, 4, 0),
+('Luis Díaz', 4, 'Forward', TO_DATE('1997-01-13', 'YYYY-MM-DD'), 'Colombia', 7, 8, 6, 25, 2, 0),
+('Cody Gakpo', 4, 'Forward', TO_DATE('1999-05-07', 'YYYY-MM-DD'), 'Netherlands', 18, 7, 4, 24, 3, 0),
+('Dominik Szoboszlai', 4, 'Midfielder', TO_DATE('2000-10-25', 'YYYY-MM-DD'), 'Hungary', 8, 5, 8, 26, 5, 0),
+('Alexis Mac Allister', 4, 'Midfielder', TO_DATE('1998-12-24', 'YYYY-MM-DD'), 'Argentina', 10, 4, 7, 25, 6, 0),
+('Trent Alexander-Arnold', 4, 'Defender', TO_DATE('1998-10-07', 'YYYY-MM-DD'), 'England', 66, 3, 10, 27, 4, 0),
+('Andrew Robertson', 4, 'Defender', TO_DATE('1994-03-11', 'YYYY-MM-DD'), 'Scotland', 26, 1, 5, 26, 3, 0),
+('Virgil van Dijk', 4, 'Defender', TO_DATE('1991-07-08', 'YYYY-MM-DD'), 'Netherlands', 4, 2, 1, 25, 2, 0),
+('Ibrahima Konaté', 4, 'Defender', TO_DATE('1999-05-25', 'YYYY-MM-DD'), 'France', 5, 1, 1, 24, 3, 0),
+('Alisson Becker', 4, 'Goalkeeper', TO_DATE('1992-10-02', 'YYYY-MM-DD'), 'Brazil', 1, 0, 0, 27, 2, 0);
+
+-- Insert Players for Manchester City
+INSERT INTO Player (name, team_id, position, dob, nationality, jersey_number, goals_scored, assists, matches_played, yellow_cards, red_cards) VALUES
+('Erling Haaland', 5, 'Forward', TO_DATE('2000-07-21', 'YYYY-MM-DD'), 'Norway', 9, 20, 4, 26, 2, 0),
+('Phil Foden', 5, 'Forward', TO_DATE('2000-05-28', 'YYYY-MM-DD'), 'England', 47, 8, 6, 22, 3, 0),
+('Kevin De Bruyne', 5, 'Midfielder', TO_DATE('1991-06-28', 'YYYY-MM-DD'), 'Belgium', 17, 5, 6, 18, 2, 0),
+('Bernardo Silva', 5, 'Midfielder', TO_DATE('1994-08-10', 'YYYY-MM-DD'), 'Portugal', 20, 4, 7, 24, 3, 0),
+('Rúben Dias', 5, 'Defender', TO_DATE('1997-05-14', 'YYYY-MM-DD'), 'Portugal', 3, 2, 1, 16, 4, 0),
+('Joško Gvardiol', 5, 'Defender', TO_DATE('2002-01-11', 'YYYY-MM-DD'), 'Croatia', 24, 0, 2, 26, 2, 0),
+('Kyle Walker', 5, 'Defender', TO_DATE('1990-05-28', 'YYYY-MM-DD'), 'England', 2, 0, 3, 10, 2, 0),
+('Rico Lewis', 5, 'Defender', TO_DATE('2004-06-21', 'YYYY-MM-DD'), 'England', 82, 0, 2, 21, 2, 0),
+('İlkay Gündoğan', 5, 'Midfielder', TO_DATE('1990-10-24', 'YYYY-MM-DD'), 'Germany', 19, 4, 5, 24, 2, 0),
+('Jack Grealish', 5, 'Forward', TO_DATE('1995-09-10', 'YYYY-MM-DD'), 'England', 10, 6, 8, 16, 4, 0),
+('Ederson Moraes', 5, 'Goalkeeper', TO_DATE('1993-08-17', 'YYYY-MM-DD'), 'Brazil', 31, 0, 0, 24, 1, 0);
+
+
+-- Insert Players for Arsenal FC
+INSERT INTO Player (name, team_id, position, dob, nationality, jersey_number, goals_scored, assists, matches_played, yellow_cards, red_cards) VALUES
+('Bukayo Saka', 6, 'Forward', TO_DATE('2001-09-05', 'YYYY-MM-DD'), 'England', 7, 12, 10, 26, 2, 0),
+('Kai Havertz', 6, 'Forward', TO_DATE('1999-06-11', 'YYYY-MM-DD'), 'Germany', 29, 9, 3, 25, 3, 0),
+('Martin Ødegaard', 6, 'Midfielder', TO_DATE('1998-12-17', 'YYYY-MM-DD'), 'Norway', 8, 8, 7, 25, 2, 0),
+('Declan Rice', 6, 'Midfielder', TO_DATE('1999-01-14', 'YYYY-MM-DD'), 'England', 41, 3, 5, 26, 4, 0),
+('Thomas Partey', 6, 'Midfielder', TO_DATE('1993-06-13', 'YYYY-MM-DD'), 'Ghana', 5, 2, 4, 24, 3, 0),
+('Gabriel Martinelli', 6, 'Midfielder', TO_DATE('2001-06-18', 'YYYY-MM-DD'), 'Brazil', 11, 6, 3, 24, 2, 0),
+('William Saliba', 6, 'Defender', TO_DATE('2001-03-24', 'YYYY-MM-DD'), 'France', 2, 1, 1, 25, 4, 0),
+('Gabriel Magalhães', 6, 'Defender', TO_DATE('1997-12-19', 'YYYY-MM-DD'), 'Brazil', 6, 2, 1, 26, 5, 0),
+('Ben White', 6, 'Defender', TO_DATE('1997-10-08', 'YYYY-MM-DD'), 'England', 4, 1, 2, 26, 3, 0),
+('Jurriën Timber', 6, 'Defender', TO_DATE('2001-06-17', 'YYYY-MM-DD'), 'Netherlands', 12, 1, 1, 24, 7, 0),
+('David Raya', 6, 'Goalkeeper', TO_DATE('1995-09-15', 'YYYY-MM-DD'), 'Spain', 22, 0, 0, 24, 1, 0);
+
+
+
+-- Insert Players for Inter Milan
+INSERT INTO Player (name, team_id, position, dob, nationality, jersey_number, goals_scored, assists, matches_played, yellow_cards, red_cards) VALUES
+('Lautaro Martínez', 7, 'Forward', TO_DATE('1997-08-22', 'YYYY-MM-DD'), 'Argentina', 10, 17, 5, 38, 4, 0),
+('Marcus Thuram', 7, 'Forward', TO_DATE('1997-08-06', 'YYYY-MM-DD'), 'France', 9, 16, 6, 37, 3, 0),
+('Nicolò Barella', 7, 'Midfielder', TO_DATE('1997-02-07', 'YYYY-MM-DD'), 'Italy', 23, 3, 8, 36, 5, 0),
+('Hakan Çalhanoğlu', 7, 'Midfielder', TO_DATE('1994-02-08', 'YYYY-MM-DD'), 'Turkey', 20, 9, 7, 31, 4, 0),
+('Piotr Zieliński', 7, 'Midfielder', TO_DATE('1994-05-20', 'YYYY-MM-DD'), 'Poland', 7, 2, 4, 33, 2, 0),
+('Denzel Dumfries', 7, 'Defender', TO_DATE('1996-04-18', 'YYYY-MM-DD'), 'Netherlands', 2, 8, 5, 37, 4, 0),
+('Stefan de Vrij', 7, 'Defender', TO_DATE('1992-02-05', 'YYYY-MM-DD'), 'Netherlands', 6, 2, 2, 33, 3, 0),
+('Francesco Acerbi', 7, 'Defender', TO_DATE('1988-02-10', 'YYYY-MM-DD'), 'Italy', 15, 0, 1, 18, 2, 0),
+('Alessandro Bastoni', 7, 'Defender', TO_DATE('1999-04-13', 'YYYY-MM-DD'), 'Italy', 95, 1, 3, 40, 4, 0),
+('Federico Dimarco', 7, 'Defender', TO_DATE('1997-11-10', 'YYYY-MM-DD'), 'Italy', 32, 2, 4, 33, 3, 0),
+('Yann Sommer', 7, 'Goalkeeper', TO_DATE('1988-12-17', 'YYYY-MM-DD'), 'Switzerland', 1, 0, 0, 36, 1, 0);
+
+
+
+-- Insert Players for Bayern Munich
+INSERT INTO Player (name, team_id, position, dob, nationality, jersey_number, goals_scored, assists, matches_played, yellow_cards, red_cards) VALUES
+('Harry Kane', 8, 'Forward', TO_DATE('1993-07-28', 'YYYY-MM-DD'), 'England', 9, 21, 6, 23, 4, 0),
+('Leroy Sané', 8, 'Forward', TO_DATE('1996-01-11', 'YYYY-MM-DD'), 'Germany', 10, 6, 4, 21, 2, 0),
+('Joshua Kimmich', 8, 'Midfielder', TO_DATE('1995-02-08', 'YYYY-MM-DD'), 'Germany', 6, 1, 5, 23, 3, 0),
+('Jamal Musiala', 8, 'Midfielder', TO_DATE('2003-02-26', 'YYYY-MM-DD'), 'Germany', 42, 11, 2, 22, 2, 0),
+('Michael Olise', 8, 'Forward', TO_DATE('2001-12-12', 'YYYY-MM-DD'), 'France', 17, 8, 7, 25, 1, 0),
+('Konrad Laimer', 8, 'Midfielder', TO_DATE('1997-05-27', 'YYYY-MM-DD'), 'Austria', 22, 2, 3, 20, 2, 0),
+('Dayot Upamecano', 8, 'Defender', TO_DATE('1998-10-27', 'YYYY-MM-DD'), 'France', 2, 2, 0, 19, 6, 0),
+('Kim Min-jae', 8, 'Defender', TO_DATE('1996-11-15', 'YYYY-MM-DD'), 'South Korea', 3, 2, 0, 23, 2, 0),
+('Alphonso Davies', 8, 'Defender', TO_DATE('2000-11-02', 'YYYY-MM-DD'), 'Canada', 19, 1, 2, 18, 0, 0),
+('Raphaël Guerreiro', 8, 'Defender', TO_DATE('1993-12-22', 'YYYY-MM-DD'), 'Portugal', 22, 1, 2, 16, 0, 0),
+('Manuel Neuer', 8, 'Goalkeeper', TO_DATE('1986-03-27', 'YYYY-MM-DD'), 'Germany', 1, 0, 0, 20, 1, 0);
+
+
+-- Insert Players for Juventus
+INSERT INTO Player (name, team_id, position, dob, nationality, jersey_number, goals_scored, assists, matches_played, yellow_cards, red_cards) VALUES
+('Dušan Vlahović', 9, 'Forward', TO_DATE('1999-01-28', 'YYYY-MM-DD'), 'Serbia', 9, 9, 1, 22, 3, 0),
+('Nicolás González', 9, 'Forward', TO_DATE('1998-04-06', 'YYYY-MM-DD'), 'Argentina', 11, 1, 2, 16, 0, 0),
+('Randal Kolo Muani', 9, 'Forward', TO_DATE('1998-12-05', 'YYYY-MM-DD'), 'France', 20, 5, 1, 7, 0, 0),
+('Manuel Locatelli', 9, 'Midfielder', TO_DATE('1998-01-08', 'YYYY-MM-DD'), 'Italy', 5, 0, 2, 26, 5, 0),
+('Teun Koopmeiners', 9, 'Midfielder', TO_DATE('1998-02-28', 'YYYY-MM-DD'), 'Netherlands', 8, 2, 3, 24, 3, 0),
+('Weston McKennie', 9, 'Midfielder', TO_DATE('1998-08-28', 'YYYY-MM-DD'), 'USA', 16, 2, 3, 22, 2, 0),
+('Khéphren Thuram', 9, 'Midfielder', TO_DATE('2001-03-26', 'YYYY-MM-DD'), 'France', 19, 3, 5, 26, 2, 0),
+('Federico Gatti', 9, 'Defender', TO_DATE('1998-06-24', 'YYYY-MM-DD'), 'Italy', 4, 1, 0, 26, 2, 0),
+('Pierre Kalulu', 9, 'Defender', TO_DATE('2000-06-05', 'YYYY-MM-DD'), 'France', 15, 1, 0, 21, 2, 0),
+('Andrea Cambiaso', 9, 'Defender', TO_DATE('2000-02-20', 'YYYY-MM-DD'), 'Italy', 27, 2, 1, 25, 4, 0),
+('Michele Di Gregorio', 9, 'Goalkeeper', TO_DATE('1997-07-27', 'YYYY-MM-DD'), 'Italy', 29, 0, 0, 23, 0, 0);
+
+-- Insert Players for Manchester United
+INSERT INTO Player (name, team_id, position, dob, nationality, jersey_number, goals_scored, assists, matches_played, yellow_cards, red_cards) VALUES
+('Rasmus Højlund', 10, 'Forward', TO_DATE('2003-02-04', 'YYYY-MM-DD'), 'Denmark', 9, 12, 2, 22, 3, 0),
+('Alejandro Garnacho', 10, 'Forward', TO_DATE('2004-07-01', 'YYYY-MM-DD'), 'Argentina', 17, 3, 1, 26, 2, 0),
+('Joshua Zirkzee', 10, 'Forward', TO_DATE('2001-05-22', 'YYYY-MM-DD'), 'Netherlands', 11, 3, 2, 27, 1, 0),
+('Bruno Fernandes', 10, 'Midfielder', TO_DATE('1994-09-08', 'YYYY-MM-DD'), 'Portugal', 8, 6, 7, 26, 4, 0),
+('Manuel Ugarte', 10, 'Midfielder', TO_DATE('2001-04-11', 'YYYY-MM-DD'), 'Uruguay', 25, 1, 0, 20, 8, 0),
+('Casemiro', 10, 'Midfielder', TO_DATE('1992-02-23', 'YYYY-MM-DD'), 'Brazil', 18, 1, 0, 17, 2, 0),
+('Kobbie Mainoo', 10, 'Midfielder', TO_DATE('2005-04-19', 'YYYY-MM-DD'), 'England', 37, 0, 5, 18, 2, 0),
+('Matthijs de Ligt', 10, 'Defender', TO_DATE('1999-08-12', 'YYYY-MM-DD'), 'Netherlands', 4, 2, 0, 25, 3, 0),
+('Lisandro Martínez', 10, 'Defender', TO_DATE('1998-01-18', 'YYYY-MM-DD'), 'Argentina', 6, 2, 1, 20, 7, 0),
+('Diogo Dalot', 10, 'Defender', TO_DATE('1999-03-18', 'YYYY-MM-DD'), 'Portugal', 20, 0, 3, 26, 2, 0),
+('André Onana', 10, 'Goalkeeper', TO_DATE('1996-04-02', 'YYYY-MM-DD'), 'Cameroon', 24, 0, 0, 24, 1, 0);
+
+
+-- Insert Referees
+INSERT INTO Referee (name, nationality, experience) VALUES 
+('Michael Oliver', 'England', 15),
+('Antonio Mateu Lahoz', 'Spain', 12),
+('Clement Turpin', 'France', 10),
+('Daniele Orsato', 'Italy', 14),
+('Felix Zwayer', 'Germany', 11),
+('Anthony Taylor', 'England', 10),
+('Szymon Marciniak', 'Poland', 12),
+('Danny Makkelie', 'Netherlands', 13),
+('István Kovács', 'Romania', 9),
+('Orel Grinfeld', 'Israel', 8);
+
+INSERT INTO Points_Table (team_id, matches_played, wins, losses, draws, goals_for, goals_against, goal_difference, points) VALUES (1, 5, 1, 0, 4, 5, 7, -2, 7);
+INSERT INTO Points_Table (team_id, matches_played, wins, losses, draws, goals_for, goals_against, goal_difference, points) VALUES (2, 5, 3, 0, 2, 7, 15, -8, 11);
+INSERT INTO Points_Table (team_id, matches_played, wins, losses, draws, goals_for, goals_against, goal_difference, points) VALUES (3, 5, 3, 2, 0, 11, 9, 2, 9);
+INSERT INTO Points_Table (team_id, matches_played, wins, losses, draws, goals_for, goals_against, goal_difference, points) VALUES (4, 5, 2, 0, 3, 5, 13, -8, 9);
+INSERT INTO Points_Table (team_id, matches_played, wins, losses, draws, goals_for, goals_against, goal_difference, points) VALUES (5, 5, 3, 0, 2, 7, 13, -6, 11);
+INSERT INTO Points_Table (team_id, matches_played, wins, losses, draws, goals_for, goals_against, goal_difference, points) VALUES (6, 5, 1, 0, 4, 9, 14, -5, 7);
+INSERT INTO Points_Table (team_id, matches_played, wins, losses, draws, goals_for, goals_against, goal_difference, points) VALUES (7, 5, 1, 3, 1, 6, 8, -2, 4);
+INSERT INTO Points_Table (team_id, matches_played, wins, losses, draws, goals_for, goals_against, goal_difference, points) VALUES (8, 5, 5, 0, 0, 15, 10, 5, 15);
+INSERT INTO Points_Table (team_id, matches_played, wins, losses, draws, goals_for, goals_against, goal_difference, points) VALUES (9, 5, 3, 1, 1, 5, 7, -2, 10);
+INSERT INTO Points_Table (team_id, matches_played, wins, losses, draws, goals_for, goals_against, goal_difference, points) VALUES (10, 5, 5, 0, 0, 8, 11, -3, 15);
+
+INSERT INTO Match (team1_id, team2_id, stadium_id, date, score_team1, score_team2, winner_id, loser_id, referee_id) VALUES 
+(1, 2, 11, TO_DATE('2024-01-01', 'YYYY-MM-DD'), 2, 1, 1, 2, 1),
+(3, 4, 12, TO_DATE('2024-01-01', 'YYYY-MM-DD'), 3, 2, 3, 4, 2),
+(5, 6, 13, TO_DATE('2024-01-01', 'YYYY-MM-DD'), 1, 1, NULL, NULL, 3),
+(7, 8, 14, TO_DATE('2024-01-01', 'YYYY-MM-DD'), 2, 0, 7, 8, 4),
+(9, 10, 15, TO_DATE('2024-01-01', 'YYYY-MM-DD'), 1, 2, 10, 9, 5),
+
+(1, 3, 11, TO_DATE('2024-01-08', 'YYYY-MM-DD'), 1, 1, NULL, NULL, 1),
+(2, 4, 12, TO_DATE('2024-01-08', 'YYYY-MM-DD'), 2, 1, 2, 4, 2),
+(5, 7, 13, TO_DATE('2024-01-08', 'YYYY-MM-DD'), 3, 1, 5, 7, 3),
+(6, 9, 14, TO_DATE('2024-01-08', 'YYYY-MM-DD'), 2, 1, 6, 9, 4),
+(8, 10, 15, TO_DATE('2024-01-08', 'YYYY-MM-DD'), 1, 1, NULL, NULL, 5),
+
+(1, 4, 16, TO_DATE('2024-01-15', 'YYYY-MM-DD'), 2, 0, 1, 4, 1),
+(2, 5, 17, TO_DATE('2024-01-15', 'YYYY-MM-DD'), 1, 2, 5, 2, 2),
+(3, 6, 18, TO_DATE('2024-01-15', 'YYYY-MM-DD'), 1, 1, NULL, NULL, 3),
+(7, 9, 19, TO_DATE('2024-01-15', 'YYYY-MM-DD'), 3, 2, 7, 9, 4),
+(8, 10, 20, TO_DATE('2024-01-15', 'YYYY-MM-DD'), 1, 1, NULL, NULL, 5),
+
+(1, 5, 11, TO_DATE('2024-01-22', 'YYYY-MM-DD'), 2, 1, 1, 5, 1),
+(2, 6, 12, TO_DATE('2024-01-22', 'YYYY-MM-DD'), 1, 2, 6, 2, 2),
+(3, 7, 13, TO_DATE('2024-01-22', 'YYYY-MM-DD'), 2, 1, 3, 7, 3),
+(4, 8, 14, TO_DATE('2024-01-22', 'YYYY-MM-DD'), 3, 0, 4, 8, 4),
+(9, 10, 15, TO_DATE('2024-01-22', 'YYYY-MM-DD'), 1, 2, 10, 9, 5),
+
+(1, 6, 16, TO_DATE('2024-01-29', 'YYYY-MM-DD'), 1, 1, NULL, NULL, 1),
+(2, 7, 17, TO_DATE('2024-01-29', 'YYYY-MM-DD'), 2, 0, 2, 7, 2),
+(3, 8, 18, TO_DATE('2024-01-29', 'YYYY-MM-DD'), 3, 1, 3, 8, 3),
+(4, 10, 19, TO_DATE('2024-01-29', 'YYYY-MM-DD'), 2, 1, 4, 10, 4),
+(5, 9, 20, TO_DATE('2024-01-29', 'YYYY-MM-DD'), 2, 1, 5, 9, 5);
+
+
+
+
+
+
