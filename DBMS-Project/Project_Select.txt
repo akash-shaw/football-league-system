@@ -1,7 +1,36 @@
 --Points table with points wins,etc
 
-select name,matches_played AS MP,wins AS W,draws AS D,losses AS L, goals_for AS GF,goals_against AS GA,goal_difference AS GD, points 
-from points_table p
-left join team t on p.team_id=t.team_id
---GROUP BY name
+SELECT name,matches_played AS MP,wins AS W,draws AS D,losses AS L, goals_for AS GF,goals_against AS GA,goal_difference AS GD, points 
+FROM POINTS_TABLE p
+LEFT JOIN TEAM t ON p.team_id=t.team_id
 ORDER BY p.points DESC;
+
+------------------------------------------------------------------------------------------------------------------------------------------
+
+--Ranking Teams with Ties
+
+WITH RankedTeams AS (
+    SELECT 
+        T.name AS TeamName,
+        PT.points AS Points,
+        PT.goal_difference AS GoalDifference,
+        PT.goals_for AS GoalsFor,
+        DENSE_RANK() OVER (ORDER BY PT.points DESC, PT.goal_difference DESC, PT.goals_for DESC) AS Rank
+    FROM Points_Table PT
+    JOIN Team T ON PT.team_id = T.team_id
+)
+SELECT * FROM RankedTeams ORDER BY Rank;
+
+---------------------------------------------------------------------------------------------------------------------------------------------
+
+
+--Head-to-head points between two teams (e.g., Team A and Team B)
+
+SELECT 
+    SUM(CASE WHEN M.winner_id = 1 THEN 2 ELSE 0 END) AS TeamAPoints,
+    SUM(CASE WHEN M.winner_id = 2 THEN 2 ELSE 0 END) AS TeamBPoints
+FROM Match M
+WHERE (M.team1_id = 4 AND M.team2_id = 1) OR (M.team1_id = 1 AND M.team2_id = 4);
+
+--------------------------------------------------------------------------------------------------------------------------------------------
+
