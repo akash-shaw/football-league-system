@@ -203,4 +203,10 @@ export const getAllStadiumManagers = async () => {
   return response.data;
 };
 
+// Get all referees
+export const getAllReferees = async () => {
+  const response = await api.get('/users/referees');
+  return response.data;
+};
+
 export default api;

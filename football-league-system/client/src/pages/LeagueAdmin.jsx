@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { 
   getAllTeams, getAllStadiums, getAllMatches, 
-  createTeam, createPlayer, createStadium, createMatch, updateMatchScore , getAllTeamManagers, getPlayerUsers, getAllStadiumManagers
+  createTeam, createPlayer, createStadium, createMatch, updateMatchScore , getAllTeamManagers, getPlayerUsers, getAllStadiumManagers, getAllReferees
 } from '../services/api';
 
 function LeagueAdmin() {
@@ -14,6 +14,7 @@ function LeagueAdmin() {
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
   const [stadiumManagers, setStadiumManagers] = useState([]);
+  const [referees, setReferees] = useState([]);
   
   // Form states
   const [teamForm, setTeamForm] = useState({ name: '', manager_id: '', formation: '', strategy: '' });
@@ -28,14 +29,15 @@ function LeagueAdmin() {
       try {
         setLoading(true);
         
-        const [teamsData, playersData, stadiumsData, matchesData, managersData, stadiumManagersData] = await Promise.all([
+        const [teamsData, playersData, stadiumsData, matchesData, managersData, stadiumManagersData, refereesData] = await Promise.all([
           getAllTeams(),
           // getAllPlayers(),
           getPlayerUsers(),
           getAllStadiums(),
           getAllMatches(),
           getAllTeamManagers(),
-          getAllStadiumManagers()
+          getAllStadiumManagers(),
+          getAllReferees()
         ]);
         
         setTeams(teamsData);
@@ -44,6 +46,7 @@ function LeagueAdmin() {
         setMatches(matchesData);
         setManagers(managersData);
         setStadiumManagers(stadiumManagersData);
+        setReferees(refereesData);
         
         setLoading(false);
       } catch (error) {
@@ -665,9 +668,9 @@ function LeagueAdmin() {
                           required
                         >
                           <option value="">Select Referee</option>
-                          {players.filter(player => player.role === 'referee').map(referee => (
+                          {referees.map(referee => (
                             <option key={referee.id} value={referee.id}>
-                              {referee.username}
+                              {referee.name || referee.username}
                             </option>
                           ))}
                         </select>
