@@ -197,4 +197,10 @@ export const getPlayerUsers = async () => {
   return response.data;
 };
 
+// Get all stadium managers
+export const getAllStadiumManagers = async () => {
+  const response = await api.get('/users/stadium-managers');
+  return response.data;
+};
+
 export default api;

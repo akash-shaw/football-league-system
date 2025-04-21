@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { 
   getAllTeams, getAllStadiums, getAllMatches, 
-  createTeam, createPlayer, createStadium, createMatch, updateMatchScore , getAllTeamManagers, getPlayerUsers
+  createTeam, createPlayer, createStadium, createMatch, updateMatchScore , getAllTeamManagers, getPlayerUsers, getAllStadiumManagers
 } from '../services/api';
 
 function LeagueAdmin() {
@@ -13,6 +13,7 @@ function LeagueAdmin() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
+  const [stadiumManagers, setStadiumManagers] = useState([]);
   
   // Form states
   const [teamForm, setTeamForm] = useState({ name: '', manager_id: '', formation: '', strategy: '' });
@@ -27,13 +28,14 @@ function LeagueAdmin() {
       try {
         setLoading(true);
         
-        const [teamsData, playersData, stadiumsData, matchesData, managersData] = await Promise.all([
+        const [teamsData, playersData, stadiumsData, matchesData, managersData, stadiumManagersData] = await Promise.all([
           getAllTeams(),
           // getAllPlayers(),
           getPlayerUsers(),
           getAllStadiums(),
           getAllMatches(),
-          getAllTeamManagers()
+          getAllTeamManagers(),
+          getAllStadiumManagers()
         ]);
         
         setTeams(teamsData);
@@ -41,6 +43,7 @@ function LeagueAdmin() {
         setStadiums(stadiumsData);
         setMatches(matchesData);
         setManagers(managersData);
+        setStadiumManagers(stadiumManagersData);
         
         setLoading(false);
       } catch (error) {
@@ -534,9 +537,9 @@ function LeagueAdmin() {
                           required
                         >
                           <option value="">Select Manager</option>
-                          {players.filter(player => player.role === 'stadium_manager').map(manager => (
+                          {stadiumManagers.map(manager => (
                             <option key={manager.id} value={manager.id}>
-                              {manager.username}
+                              {manager.name || manager.username}
                             </option>
                           ))}
                         </select>

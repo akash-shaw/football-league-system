@@ -75,4 +75,18 @@ router.get('/players', async (req, res) => {
   }
 });
 
+// Get all stadium managers
+router.get('/stadium-managers', async (req, res) => {
+  try {
+    const stadiumManagers = await pool.query(
+      'SELECT id, username, email, name FROM users WHERE role = $1',
+      ['stadium_manager']
+    );
+    res.json(stadiumManagers.rows);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
 module.exports = router;
