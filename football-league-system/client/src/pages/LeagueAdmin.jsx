@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { 
   getAllTeams, getAllPlayers, getAllStadiums, getAllMatches, 
-  createTeam, createPlayer, createStadium, createMatch, updateMatchScore 
+  createTeam, createPlayer, createStadium, createMatch, updateMatchScore , getAllTeamManagers
 } from '../services/api';
 
 function LeagueAdmin() {
@@ -20,23 +20,26 @@ function LeagueAdmin() {
   const [stadiumForm, setStadiumForm] = useState({ name: '', location: '', capacity: '', manager_id: '' });
   const [matchForm, setMatchForm] = useState({ home_team_id: '', away_team_id: '', stadium_id: '', referee_id: '', match_date: '' });
   const [scoreForm, setScoreForm] = useState({ match_id: '', home_score: '', away_score: '' });
+  const [managers, setManagers] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
         
-        const [teamsData, playersData, stadiumsData, matchesData] = await Promise.all([
+        const [teamsData, playersData, stadiumsData, matchesData, managersData] = await Promise.all([
           getAllTeams(),
           getAllPlayers(),
           getAllStadiums(),
-          getAllMatches()
+          getAllMatches(),
+          getAllTeamManagers()
         ]);
         
         setTeams(teamsData);
         setPlayers(playersData);
         setStadiums(stadiumsData);
         setMatches(matchesData);
+        setManagers(managersData);
         
         setLoading(false);
       } catch (error) {
@@ -225,9 +228,9 @@ function LeagueAdmin() {
                           required
                         >
                           <option value="">Select Manager</option>
-                          {players.filter(player => player.role === 'team_manager').map(manager => (
+                          {managers.map(manager => (
                             <option key={manager.id} value={manager.id}>
-                              {manager.username}
+                              {manager.name || manager.username}
                             </option>
                           ))}
                         </select>

@@ -43,4 +43,18 @@ router.put('/profile', auth, async (req, res) => {
   }
 });
 
+// Get all team managers
+router.get('/managers', async (req, res) => {
+  try {
+    const managers = await pool.query(
+      'SELECT id, username, email, name FROM users WHERE role = $1',
+      ['team_manager']
+    );
+    res.json(managers.rows);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
 module.exports = router;

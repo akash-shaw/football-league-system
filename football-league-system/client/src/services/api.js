@@ -185,4 +185,10 @@ export const getPointsTable = async () => {
   return response.data;
 };
 
+// Get all team managers
+export const getAllTeamManagers = async () => {
+  const response = await api.get('/users/managers');
+  return response.data;
+};
+
 export default api;
