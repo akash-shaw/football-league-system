@@ -89,7 +89,7 @@ router.get('/:id/players', async (req, res) => {
     const { id } = req.params;
     
     const players = await pool.query(
-      'SELECT p.*, u.username, u.email FROM players p JOIN users u ON p.user_id = u.id WHERE p.team_id = $1',
+      'SELECT p.*, u.name, u.username, u.email FROM players p JOIN users u ON p.user_id = u.id WHERE p.team_id = $1',
       [id]
     );
     

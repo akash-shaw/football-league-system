@@ -242,7 +242,7 @@ function TeamManager() {
                   {availablePlayers.map(player => (
                     <div key={player.id} className="list-group-item d-flex justify-content-between align-items-center">
                       <div>
-                        <strong>{player.username}</strong>
+                        <strong>{player.name || player.username}</strong>
                         {player.position && <span className="ms-2 badge bg-secondary">{player.position}</span>}
                       </div>
                       <button 
@@ -273,7 +273,7 @@ function TeamManager() {
                   {teamPlayers.map(player => (
                     <div key={player.id} className="list-group-item d-flex justify-content-between align-items-center">
                       <div>
-                        <strong>{player.username}</strong>
+                        <strong>{player.name || player.username}</strong>
                         {player.position && <span className="ms-2 badge bg-primary">{player.position}</span>}
                       </div>
                       <button 
