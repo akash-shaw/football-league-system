@@ -1,0 +1,24 @@
+.App {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.container {
+  flex: 1;
+}
+
+.nav-tabs .nav-link {
+  cursor: pointer;
+}
+
+.card-header-tabs {
+  margin-right: 0;
+  margin-bottom: -1px;
+  margin-left: 0;
+  border-bottom: 0;
+}
+
+.card-header-tabs .nav-link {
+  margin-bottom: 0;
+}
