@@ -28,7 +28,7 @@ function MatchCard({ match }) {
           </div>
         </div>
         <div className="card-footer text-muted">
-          Stadium: {match.stadium} | Referee: {match.referee || 'TBA'}
+          Stadium: {match.stadium} | Referee: { match.referee_name || match.referee || 'TBA'}
         </div>
       </div>
     );

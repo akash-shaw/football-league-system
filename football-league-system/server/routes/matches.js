@@ -9,7 +9,7 @@ router.get('/', async (req, res) => {
   try {
     const matches = await pool.query(
       'SELECT m.*, ht.name as home_team, at.name as away_team, s.name as stadium, ' +
-      'u.username as referee FROM matches m ' +
+      'u.name as referee_name, u.username as referee FROM matches m ' +
       'JOIN teams ht ON m.home_team_id = ht.id ' +
       'JOIN teams at ON m.away_team_id = at.id ' +
       'JOIN stadiums s ON m.stadium_id = s.id ' +
@@ -28,7 +28,7 @@ router.get('/upcoming', async (req, res) => {
   try {
     const matches = await pool.query(
       'SELECT m.*, ht.name as home_team, at.name as away_team, s.name as stadium, ' +
-      'u.username as referee FROM matches m ' +
+      'u.name as referee_name, u.username as referee FROM matches m ' +
       'JOIN teams ht ON m.home_team_id = ht.id ' +
       'JOIN teams at ON m.away_team_id = at.id ' +
       'JOIN stadiums s ON m.stadium_id = s.id ' +
@@ -48,7 +48,7 @@ router.get('/past', async (req, res) => {
   try {
     const matches = await pool.query(
       'SELECT m.*, ht.name as home_team, at.name as away_team, s.name as stadium, ' +
-      'u.username as referee FROM matches m ' +
+      'u.name as referee_name, u.username as referee FROM matches m ' +
       'JOIN teams ht ON m.home_team_id = ht.id ' +
       'JOIN teams at ON m.away_team_id = at.id ' +
       'JOIN stadiums s ON m.stadium_id = s.id ' +
@@ -70,7 +70,7 @@ router.get('/:id', async (req, res) => {
     
     const match = await pool.query(
       'SELECT m.*, ht.name as home_team, at.name as away_team, s.name as stadium, ' +
-      'u.username as referee FROM matches m ' +
+      'u.name as referee_name, u.username as referee FROM matches m ' +
       'JOIN teams ht ON m.home_team_id = ht.id ' +
       'JOIN teams at ON m.away_team_id = at.id ' +
       'JOIN stadiums s ON m.stadium_id = s.id ' +
