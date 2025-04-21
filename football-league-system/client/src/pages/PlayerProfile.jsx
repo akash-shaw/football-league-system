@@ -4,6 +4,7 @@ import { getPlayerProfile, updatePlayer } from '../services/api';
 function PlayerProfile() {
   const [profile, setProfile] = useState(null);
   const [formData, setFormData] = useState({
+    name: '',
     position: '',
     age: '',
     height: '',
@@ -21,6 +22,7 @@ function PlayerProfile() {
         const data = await getPlayerProfile();
         setProfile(data);
         setFormData({
+          name: data.name || '',
           position: data.position || '',
           age: data.age || '',
           height: data.height || '',
@@ -99,7 +101,7 @@ function PlayerProfile() {
                 <label htmlFor="name" className="form-label">Full Name</label>
                 <input
                   type="text"
-                    className="form-control"
+                  className="form-control"
                   id="name"
                   name="name"
                   value={formData.name}

@@ -57,11 +57,15 @@ router.get('/managers', async (req, res) => {
   }
 });
 
-// Get all users with player role
+// Get all players with profile data
 router.get('/players', async (req, res) => {
   try {
     const players = await pool.query(
-      'SELECT id, username, email, name, role FROM users WHERE role = $1',
+      'SELECT u.id, u.username, u.email, u.name, u.role, p.position, p.age, p.height, p.weight, t.name as team_name ' +
+      'FROM users u ' +
+      'LEFT JOIN players p ON u.id = p.user_id ' +
+      'LEFT JOIN teams t ON p.team_id = t.id ' +
+      'WHERE u.role = $1',
       ['player']
     );
     res.json(players.rows);

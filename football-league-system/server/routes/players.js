@@ -64,7 +64,7 @@ router.post('/', auth, checkRole(['league_admin']), async (req, res) => {
 router.put('/:id', auth, async (req, res) => {
   try {
     const { id } = req.params;
-    const { position, age, height, weight } = req.body;
+    const { name, position, age, height, weight } = req.body;
     
     // Check if user is the player or league admin
     if (req.user.role !== 'league_admin') {
@@ -78,6 +78,15 @@ router.put('/:id', auth, async (req, res) => {
       }
     }
     
+    // First update the user's name in the users table
+    if (name) {
+      await pool.query(
+        'UPDATE users SET name = $1 WHERE id = (SELECT user_id FROM players WHERE id = $2)',
+        [name, id]
+      );
+    }
+    
+    // Then update the player profile
     const updatedPlayer = await pool.query(
       'UPDATE players SET position = $1, age = $2, height = $3, weight = $4 WHERE id = $5 RETURNING *',
       [position, age, height, weight, id]
@@ -87,7 +96,13 @@ router.put('/:id', auth, async (req, res) => {
       return res.status(404).json({ message: 'Player not found' });
     }
     
-    res.json(updatedPlayer.rows[0]);
+    // Get the updated player with the user's name
+    const playerWithName = await pool.query(
+      'SELECT p.*, u.name, u.username FROM players p JOIN users u ON p.user_id = u.id WHERE p.id = $1',
+      [id]
+    );
+    
+    res.json(playerWithName.rows[0]);
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Server error' });
@@ -100,8 +115,9 @@ router.get('/profile/me', auth, checkRole(['player']), async (req, res) => {
     const userId = req.user.id;
     
     const player = await pool.query(
-      'SELECT p.*, t.name as team_name FROM players p ' +
+      'SELECT p.*, t.name as team_name, u.name, u.username FROM players p ' +
       'LEFT JOIN teams t ON p.team_id = t.id ' +
+      'LEFT JOIN users u ON p.user_id = u.id ' +
       'WHERE p.user_id = $1',
       [userId]
     );

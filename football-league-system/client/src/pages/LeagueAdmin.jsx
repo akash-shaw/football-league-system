@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { 
-  getAllTeams, getAllPlayers, getAllStadiums, getAllMatches, 
+  getAllTeams, getAllStadiums, getAllMatches, 
   createTeam, createPlayer, createStadium, createMatch, updateMatchScore , getAllTeamManagers, getPlayerUsers
 } from '../services/api';
 
@@ -460,7 +460,7 @@ function LeagueAdmin() {
                             {players.map(player => (
                               <tr key={player.id}>
                                 <td>{player.id}</td>
-                                <td>{player.username}</td>
+                                <td>{player.name || player.username}</td>
                                 <td>{player.position || 'N/A'}</td>
                                 <td>{player.team_name || 'N/A'}</td>
                               </tr>
