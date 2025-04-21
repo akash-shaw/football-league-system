@@ -8,7 +8,7 @@ const router = express.Router();
 router.get('/', async (req, res) => {
   try {
     const players = await pool.query(
-      'SELECT p.*, u.username, u.email, t.name as team_name FROM players p ' +
+      'SELECT p.*, u.username, u.email, u.name, t.name as team_name FROM players p ' +
       'LEFT JOIN users u ON p.user_id = u.id ' +
       'LEFT JOIN teams t ON p.team_id = t.id'
     );
@@ -25,7 +25,7 @@ router.get('/:id', async (req, res) => {
     const { id } = req.params;
     
     const player = await pool.query(
-      'SELECT p.*, u.username, u.email, t.name as team_name FROM players p ' +
+      'SELECT p.*, u.username, u.email, u.name, t.name as team_name FROM players p ' +
       'LEFT JOIN users u ON p.user_id = u.id ' +
       'LEFT JOIN teams t ON p.team_id = t.id ' +
       'WHERE p.id = $1',

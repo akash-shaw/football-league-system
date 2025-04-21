@@ -160,10 +160,19 @@ function Home() {
               ) : (
                 <ul className="list-group">
                   {players.slice(0, 10).map(player => (
-                    <li key={player.id} className="list-group-item">
-                      {player.username} - {player.position || 'N/A'}
-                      {player.team_name && <span className="badge bg-primary float-end">{player.team_name}</span>}
-                    </li>
+                    <li key={player.id} className="list-group-item d-flex justify-content-between align-items-center">
+                    <span
+                      style={{
+                        whiteSpace: 'nowrap',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        display: 'inline-block'
+                      }}
+                    >
+                      {player.name || player.username} - {player.position || 'N/A'}
+                    </span>
+                    {player.team_name && <span className="badge bg-primary">{player.team_name}</span>}
+                  </li>
                   ))}
                   {players.length > 10 && (
                     <li className="list-group-item text-center text-muted">
