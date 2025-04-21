@@ -39,7 +39,7 @@ function Dashboard({ user }) {
           <h4 className="mb-0">Dashboard</h4>
         </div>
         <div className="card-body">
-          <h5>Welcome, {profile?.username}!</h5>
+        <h5>Welcome, {profile?.name || profile?.username}!</h5>
           <p>Your role: <span className="badge bg-primary">{profile?.role.replace('_', ' ')}</span></p>
           <p>Email: {profile?.email}</p>
           

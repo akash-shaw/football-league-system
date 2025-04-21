@@ -8,7 +8,8 @@ function Register({ setUser }) {
     email: '',
     password: '',
     confirmPassword: '',
-    role: ''
+    role: '',
+    name: ''
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -38,7 +39,8 @@ function Register({ setUser }) {
         username: formData.username,
         email: formData.email,
         password: formData.password,
-        role: formData.role
+        role: formData.role,
+        name: formData.name
       };
       
       const response = await register(userData);
@@ -82,6 +84,19 @@ function Register({ setUser }) {
             {error && <div className="alert alert-danger">{error}</div>}
             
             <form onSubmit={handleSubmit}>
+            <div className="mb-3">
+                <label htmlFor="name" className="form-label">Full Name</label>
+                <input
+                  type="text"
+                  className="form-control"
+                  id="name"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+              
               <div className="mb-3">
                 <label htmlFor="username" className="form-label">Username</label>
                 <input

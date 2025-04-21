@@ -8,7 +8,7 @@ const router = express.Router();
 // Register
 router.post('/register', async (req, res) => {
   try {
-    const { username, email, password, role } = req.body;
+    const { username, email, password, role, name } = req.body;
     
     // Validate role
     const validRoles = ['league_admin', 'player', 'team_manager', 'referee', 'stadium_manager'];
@@ -30,10 +30,10 @@ router.post('/register', async (req, res) => {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    // Insert user
+    // Insert user with name field
     const newUser = await pool.query(
-      'INSERT INTO users (username, email, password, role) VALUES ($1, $2, $3, $4) RETURNING *',
-      [username, email, hashedPassword, role]
+      'INSERT INTO users (username, email, password, role, name) VALUES ($1, $2, $3, $4, $5) RETURNING *',
+      [username, email, hashedPassword, role, name]
     );
 
     // Create token
@@ -49,7 +49,8 @@ router.post('/register', async (req, res) => {
         id: newUser.rows[0].id,
         username: newUser.rows[0].username,
         email: newUser.rows[0].email,
-        role: newUser.rows[0].role
+        role: newUser.rows[0].role,
+        name: newUser.rows[0].name
       }
     });
   } catch (error) {
@@ -57,6 +58,7 @@ router.post('/register', async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 });
+
 
 // Login
 router.post('/login', async (req, res) => {

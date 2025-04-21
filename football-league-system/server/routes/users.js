@@ -29,11 +29,11 @@ router.get('/profile', auth, async (req, res) => {
 router.put('/profile', auth, async (req, res) => {
   try {
     const userId = req.user.id;
-    const { username, email } = req.body;
+    const { username, email, name } = req.body;
     
     const updatedUser = await pool.query(
-      'UPDATE users SET username = $1, email = $2 WHERE id = $3 RETURNING id, username, email, role',
-      [username, email, userId]
+      'UPDATE users SET username = $1, email = $2, name = $3 WHERE id = $4 RETURNING id, username, email, role, name',
+      [username, email, name, userId]
     );
 
     res.json(updatedUser.rows[0]);

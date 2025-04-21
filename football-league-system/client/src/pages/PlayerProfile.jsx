@@ -94,7 +94,20 @@ function PlayerProfile() {
             
             <form onSubmit={handleSubmit}>
               <h5>Personal Details</h5>
-              
+
+              <div className="mb-3">
+                <label htmlFor="name" className="form-label">Full Name</label>
+                <input
+                  type="text"
+                    className="form-control"
+                  id="name"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+
               <div className="mb-3">
                 <label htmlFor="position" className="form-label">Position</label>
                 <select
