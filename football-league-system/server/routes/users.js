@@ -57,4 +57,18 @@ router.get('/managers', async (req, res) => {
   }
 });
 
+// Get all users with player role
+router.get('/players', async (req, res) => {
+  try {
+    const players = await pool.query(
+      'SELECT id, username, email, name, role FROM users WHERE role = $1',
+      ['player']
+    );
+    res.json(players.rows);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
 module.exports = router;

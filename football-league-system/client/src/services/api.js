@@ -191,4 +191,10 @@ export const getAllTeamManagers = async () => {
   return response.data;
 };
 
+// In api.js
+export const getPlayerUsers = async () => {
+  const response = await api.get('/users/players');
+  return response.data;
+};
+
 export default api;

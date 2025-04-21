@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { 
   getAllTeams, getAllPlayers, getAllStadiums, getAllMatches, 
-  createTeam, createPlayer, createStadium, createMatch, updateMatchScore , getAllTeamManagers
+  createTeam, createPlayer, createStadium, createMatch, updateMatchScore , getAllTeamManagers, getPlayerUsers
 } from '../services/api';
 
 function LeagueAdmin() {
@@ -29,7 +29,8 @@ function LeagueAdmin() {
         
         const [teamsData, playersData, stadiumsData, matchesData, managersData] = await Promise.all([
           getAllTeams(),
-          getAllPlayers(),
+          // getAllPlayers(),
+          getPlayerUsers(),
           getAllStadiums(),
           getAllMatches(),
           getAllTeamManagers()
@@ -326,23 +327,26 @@ function LeagueAdmin() {
                   </div>
                   <div className="card-body">
                     <form onSubmit={handlePlayerSubmit}>
-                      <div className="mb-3">
-                        <label htmlFor="player-user" className="form-label">User</label>
-                        <select
-                          className="form-select"
-                          id="player-user"
-                          value={playerForm.user_id}
-                          onChange={(e) => setPlayerForm({...playerForm, user_id: e.target.value})}
-                          required
-                        >
-                          <option value="">Select User</option>
-                          {players.filter(player => player.role === 'player').map(user => (
+                    <div className="mb-3">
+                      <label htmlFor="player-user" className="form-label">User</label>
+                      <select
+                        className="form-select"
+                        id="player-user"
+                        value={playerForm.user_id}
+                        onChange={(e) => setPlayerForm({...playerForm, user_id: e.target.value})}
+                        required
+                      >
+                        <option value="">Select User</option>
+                        {players && players.length > 0 ? 
+                          players.filter(player => player.role === 'player').map(user => (
                             <option key={user.id} value={user.id}>
-                              {user.username}
+                              {user.username || user.name}
                             </option>
-                          ))}
-                        </select>
-                      </div>
+                          )) : 
+                          <option value="" disabled>No users available</option>
+                        }
+                      </select>
+                    </div>
                       
                       <div className="mb-3">
                         <label htmlFor="player-team" className="form-label">Team</label>
