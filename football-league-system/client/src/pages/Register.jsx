@@ -164,7 +164,7 @@ function Register({ setUser }) {
                   required
                 >
                   <option value="">Select a role</option>
-                  <option value="league_admin">League Admin</option>
+                  {/* <option value="league_admin">League Admin</option> */}
                   <option value="team_manager">Team Manager</option>
                   <option value="player">Player</option>
                   <option value="referee">Referee</option>
