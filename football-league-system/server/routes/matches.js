@@ -202,71 +202,22 @@ router.get('/referee/me/past', auth, checkRole(['referee']), async (req, res) =>
 // Get points table
 router.get('/table/points', async (req, res) => {
   try {
-    // This is a complex query to calculate points table using nested queries
-    // For each team, we calculate:
-    // - Matches played
-    // - Wins
-    // - Draws
-    // - Losses
-    // - Goals for
-    // - Goals against
-    // - Goal difference
-    // - Points (3 for win, 1 for draw)
-    
+    // Use the points_table instead of the complex query
     const pointsTable = await pool.query(`
-      WITH match_results AS (
-        SELECT 
-          m.id AS match_id,
-          m.home_team_id,
-          m.away_team_id,
-          m.home_score,
-          m.away_score,
-          m.status,
-          CASE 
-            WHEN m.home_score > m.away_score THEN m.home_team_id
-            WHEN m.away_score > m.home_score THEN m.away_team_id
-            ELSE NULL
-          END AS winner_id,
-          CASE 
-            WHEN m.home_score = m.away_score THEN TRUE
-            ELSE FALSE
-          END AS is_draw
-        FROM matches m
-        WHERE m.status = 'completed'
-      ),
-      team_stats AS (
-        SELECT 
-          t.id AS team_id,
-          t.name AS team_name,
-          COUNT(DISTINCT m.match_id) AS matches_played,
-          SUM(CASE WHEN m.home_team_id = t.id THEN m.home_score ELSE m.away_score END) AS goals_for,
-          SUM(CASE WHEN m.home_team_id = t.id THEN m.away_score ELSE m.home_score END) AS goals_against,
-          COUNT(CASE WHEN m.winner_id = t.id THEN 1 END) AS wins,
-          SUM(CASE WHEN m.is_draw THEN 1 ELSE 0 END) AS draws,
-          (COUNT(DISTINCT m.match_id) - COUNT(CASE WHEN m.winner_id = t.id THEN 1 END) - SUM(CASE WHEN m.is_draw THEN 1 ELSE 0 END)) AS losses
-        FROM teams t
-        LEFT JOIN (
-          SELECT match_id, home_team_id, away_team_id, home_score, away_score, winner_id, is_draw
-          FROM match_results
-          UNION ALL
-          SELECT match_id, away_team_id AS home_team_id, home_team_id AS away_team_id, away_score AS home_score, home_score AS away_score, winner_id, is_draw
-          FROM match_results
-        ) m ON t.id = m.home_team_id
-        GROUP BY t.id, t.name
-      )
       SELECT 
-        team_id,
-        team_name,
-        matches_played AS played,
-        wins,
-        draws,
-        losses,
-        goals_for,
-        goals_against,
-        (goals_for - goals_against) AS goal_difference,
-        (wins * 3 + draws) AS points
-      FROM team_stats
-      ORDER BY points DESC, goal_difference DESC, goals_for DESC
+        p.team_id,
+        t.name AS team_name,
+        p.played,
+        p.wins,
+        p.draws,
+        p.losses,
+        p.goals_for,
+        p.goals_against,
+        p.goal_difference,
+        p.points
+      FROM points_table p
+      JOIN teams t ON p.team_id = t.id
+      ORDER BY p.points DESC, p.goal_difference DESC, p.goals_for DESC
     `);
     
     res.json(pointsTable.rows);
