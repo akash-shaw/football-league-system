@@ -103,4 +103,18 @@ router.get('/referees', async (req, res) => {
   }
 });
 
+// Get all users with player role
+router.get('/player-users', async (req, res) => {
+  try {
+    const users = await pool.query(
+      'SELECT u.* FROM users u WHERE u.role = $1',
+      ['player']
+    );
+    res.json(users.rows);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
 module.exports = router;

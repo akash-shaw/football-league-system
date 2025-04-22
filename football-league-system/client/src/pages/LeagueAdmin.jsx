@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
 import { 
   getAllTeams, getAllStadiums, getAllMatches, 
-  createTeam, createPlayer, createStadium, createMatch, updateMatchScore , getAllTeamManagers, getPlayerUsers, getAllStadiumManagers, getAllReferees
+  createTeam, createPlayer, createStadium, createMatch, updateMatchScore,
+  getAllTeamManagers, getPlayerUsers, getAllStadiumManagers, getAllReferees,
+  getAllPlayerUsers, getAllPlayers
 } from '../services/api';
 
 function LeagueAdmin() {
@@ -15,6 +17,8 @@ function LeagueAdmin() {
   const [success, setSuccess] = useState(null);
   const [stadiumManagers, setStadiumManagers] = useState([]);
   const [referees, setReferees] = useState([]);
+  const [playerUsers, setPlayerUsers] = useState([]);
+  const [existingPlayerProfiles, setExistingPlayerProfiles] = useState([]);
   
   // Form states
   const [teamForm, setTeamForm] = useState({ name: '', manager_id: '', formation: '', strategy: '' });
@@ -29,15 +33,26 @@ function LeagueAdmin() {
       try {
         setLoading(true);
         
-        const [teamsData, playersData, stadiumsData, matchesData, managersData, stadiumManagersData, refereesData] = await Promise.all([
+        const [
+          teamsData, 
+          playersData, 
+          stadiumsData, 
+          matchesData, 
+          managersData, 
+          stadiumManagersData, 
+          refereesData,
+          playerUsersData,
+          existingPlayersData
+        ] = await Promise.all([
           getAllTeams(),
-          // getAllPlayers(),
           getPlayerUsers(),
           getAllStadiums(),
           getAllMatches(),
           getAllTeamManagers(),
           getAllStadiumManagers(),
-          getAllReferees()
+          getAllReferees(),
+          getAllPlayerUsers(),
+          getAllPlayers()
         ]);
         
         setTeams(teamsData);
@@ -47,6 +62,8 @@ function LeagueAdmin() {
         setManagers(managersData);
         setStadiumManagers(stadiumManagersData);
         setReferees(refereesData);
+        setPlayerUsers(playerUsersData);
+        setExistingPlayerProfiles(existingPlayersData);
         
         setLoading(false);
       } catch (error) {
@@ -83,6 +100,10 @@ function LeagueAdmin() {
     try {
       const newPlayer = await createPlayer(playerForm);
       setPlayers([...players, newPlayer]);
+      
+      // Update existing player profiles
+      setExistingPlayerProfiles([...existingPlayerProfiles, newPlayer]);
+      
       setPlayerForm({ user_id: '', team_id: '', position: '', age: '', height: '', weight: '' });
       setSuccess('Player created successfully!');
     } catch (error) {
@@ -333,26 +354,31 @@ function LeagueAdmin() {
                   </div>
                   <div className="card-body">
                     <form onSubmit={handlePlayerSubmit}>
-                    <div className="mb-3">
-                      <label htmlFor="player-user" className="form-label">User</label>
-                      <select
-                        className="form-select"
-                        id="player-user"
-                        value={playerForm.user_id}
-                        onChange={(e) => setPlayerForm({...playerForm, user_id: e.target.value})}
-                        required
-                      >
-                        <option value="">Select User</option>
-                        {players && players.length > 0 ? 
-                          players.filter(player => player.role === 'player').map(user => (
-                            <option key={user.id} value={user.id}>
-                              {user.username || user.name}
-                            </option>
-                          )) : 
-                          <option value="" disabled>No users available</option>
-                        }
-                      </select>
-                    </div>
+                      <div className="mb-3">
+                        <label htmlFor="player-user" className="form-label">User</label>
+                        <select
+                          className="form-select"
+                          id="player-user"
+                          value={playerForm.user_id}
+                          onChange={(e) => setPlayerForm({...playerForm, user_id: e.target.value})}
+                          required
+                        >
+                          <option value="">Select User</option>
+                          {playerUsers && playerUsers.length > 0 ? 
+                            playerUsers
+                              .filter(user => 
+                                // Filter out users who already have player profiles
+                                !existingPlayerProfiles.some(player => player.user_id === user.id)
+                              )
+                              .map(user => (
+                                <option key={user.id} value={user.id}>
+                                  {user.name || user.username}
+                                </option>
+                              )) : 
+                            <option value="" disabled>No users available</option>
+                          }
+                        </select>
+                      </div>
                       
                       <div className="mb-3">
                         <label htmlFor="player-team" className="form-label">Team</label>
@@ -853,4 +879,3 @@ function LeagueAdmin() {
 }
 
 export default LeagueAdmin;
-

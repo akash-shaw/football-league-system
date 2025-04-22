@@ -227,4 +227,10 @@ export const getMyPlayerStatistics = async () => {
   return response.data;
 };
 
+// Get all users with player role
+export const getAllPlayerUsers = async () => {
+  const response = await api.get('/users/player-users');
+  return response.data;
+};
+
 export default api;
