@@ -215,4 +215,16 @@ export const getTeamStatistics = async (teamId) => {
   return response.data;
 };
 
+// Get player statistics
+export const getPlayerStatistics = async (playerId) => {
+  const response = await api.get(`/players/${playerId}/statistics`);
+  return response.data;
+};
+
+// Get current player's statistics
+export const getMyPlayerStatistics = async () => {
+  const response = await api.get('/players/statistics/me');
+  return response.data;
+};
+
 export default api;
