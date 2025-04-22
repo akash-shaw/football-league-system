@@ -175,4 +175,131 @@ router.delete('/:id/players/:playerId', auth, checkRole(['team_manager', 'league
   }
 });
 
+// Get team statistics (Team Manager or League Admin only)
+router.get('/:id/statistics', auth, checkRole(['team_manager', 'league_admin']), async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    // Check if user is the team manager (if not admin)
+    if (req.user.role === 'team_manager') {
+      const teamCheck = await pool.query(
+        'SELECT * FROM teams WHERE id = $1 AND manager_id = $2',
+        [id, req.user.id]
+      );
+      
+      if (teamCheck.rows.length === 0) {
+        return res.status(403).json({ message: 'You can only view statistics for your own team' });
+      }
+    }
+    
+    // Get basic team info
+    const teamInfo = await pool.query('SELECT * FROM teams WHERE id = $1', [id]);
+    
+    if (teamInfo.rows.length === 0) {
+      return res.status(404).json({ message: 'Team not found' });
+    }
+    
+    // Get match history
+    const matchHistory = await pool.query(
+      `SELECT 
+        m.id, m.match_date, m.home_score, m.away_score, m.status,
+        CASE WHEN m.home_team_id = $1 THEN 'home' ELSE 'away' END AS venue,
+        CASE 
+          WHEN m.home_team_id = $1 AND m.home_score > m.away_score THEN 'win'
+          WHEN m.away_team_id = $1 AND m.away_score > m.home_score THEN 'win'
+          WHEN m.home_score = m.away_score THEN 'draw'
+          ELSE 'loss'
+        END AS result,
+        CASE WHEN m.home_team_id = $1 THEN ot.name ELSE ht.name END AS opponent,
+        s.name AS stadium
+      FROM matches m
+      JOIN teams ht ON m.home_team_id = ht.id
+      JOIN teams ot ON m.away_team_id = ot.id
+      JOIN stadiums s ON m.stadium_id = s.id
+      WHERE (m.home_team_id = $1 OR m.away_team_id = $1) 
+        AND m.status = 'completed'
+      ORDER BY m.match_date DESC`,
+      [id]
+    );
+    
+    // Calculate statistics
+    const stats = await pool.query(
+      `SELECT
+        COUNT(*) AS total_matches,
+        SUM(CASE 
+          WHEN (m.home_team_id = $1 AND m.home_score > m.away_score) OR 
+               (m.away_team_id = $1 AND m.away_score > m.home_score) THEN 1 
+          ELSE 0 
+        END) AS wins,
+        SUM(CASE WHEN m.home_score = m.away_score THEN 1 ELSE 0 END) AS draws,
+        SUM(CASE 
+          WHEN (m.home_team_id = $1 AND m.home_score < m.away_score) OR 
+               (m.away_team_id = $1 AND m.away_score < m.home_score) THEN 1 
+          ELSE 0 
+        END) AS losses,
+        SUM(CASE WHEN m.home_team_id = $1 THEN m.home_score ELSE m.away_score END) AS goals_for,
+        SUM(CASE WHEN m.home_team_id = $1 THEN m.away_score ELSE m.home_score END) AS goals_against
+      FROM matches m
+      WHERE (m.home_team_id = $1 OR m.away_team_id = $1) AND m.status = 'completed'`,
+      [id]
+    );
+    
+    // Get recent form (last 5 matches)
+    const recentForm = await pool.query(
+      `SELECT 
+        CASE 
+          WHEN (m.home_team_id = $1 AND m.home_score > m.away_score) OR 
+               (m.away_team_id = $1 AND m.away_score > m.home_score) THEN 'W'
+          WHEN m.home_score = m.away_score THEN 'D'
+          ELSE 'L'
+        END AS result
+      FROM matches m
+      WHERE (m.home_team_id = $1 OR m.away_team_id = $1) 
+        AND m.status = 'completed'
+      ORDER BY m.match_date DESC
+      LIMIT 5`,
+      [id]
+    );
+    
+    // Calculate additional metrics
+    const totalMatches = parseInt(stats.rows[0].total_matches) || 0;
+    const wins = parseInt(stats.rows[0].wins) || 0;
+    const draws = parseInt(stats.rows[0].draws) || 0;
+    const losses = parseInt(stats.rows[0].losses) || 0;
+    const goalsFor = parseInt(stats.rows[0].goals_for) || 0;
+    const goalsAgainst = parseInt(stats.rows[0].goals_against) || 0;
+    
+    const winPercentage = totalMatches > 0 ? ((wins / totalMatches) * 100).toFixed(2) : 0;
+    const drawPercentage = totalMatches > 0 ? ((draws / totalMatches) * 100).toFixed(2) : 0;
+    const lossPercentage = totalMatches > 0 ? ((losses / totalMatches) * 100).toFixed(2) : 0;
+    const averageGoalsScored = totalMatches > 0 ? (goalsFor / totalMatches).toFixed(2) : 0;
+    const averageGoalsConceded = totalMatches > 0 ? (goalsAgainst / totalMatches).toFixed(2) : 0;
+    
+    // Compile and return all statistics
+    res.json({
+      team: teamInfo.rows[0],
+      matches: matchHistory.rows,
+      stats: {
+        totalMatches,
+        wins,
+        draws,
+        losses,
+        goalsFor,
+        goalsAgainst,
+        goalDifference: goalsFor - goalsAgainst,
+        winPercentage,
+        drawPercentage,
+        lossPercentage,
+        averageGoalsScored,
+        averageGoalsConceded,
+        points: wins * 3 + draws,
+        recentForm: recentForm.rows.map(m => m.result)
+      }
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
 module.exports = router;

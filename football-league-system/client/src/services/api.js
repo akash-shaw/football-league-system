@@ -209,4 +209,10 @@ export const getAllReferees = async () => {
   return response.data;
 };
 
+// Get team statistics
+export const getTeamStatistics = async (teamId) => {
+  const response = await api.get(`/teams/${teamId}/statistics`);
+  return response.data;
+};
+
 export default api;
