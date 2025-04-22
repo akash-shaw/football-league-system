@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Football League Management System - User Manual</title>
+    <style>
+        /* Global styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f5f5;
+        }
+        
+        /* Wrapper for entire content */
+        .wrapper {
+            display: flex;
+            position: relative;
+        }
+        
+        /* Sidebar styles */
+        .sidebar {
+            width: 260px;
+            height: 100vh;
+            background-color: #0d6efd;
+            padding: 20px 0;
+            position: fixed;
+            overflow-y: auto;
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+        
+        .sidebar .header {
+            padding: 20px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            margin-bottom: 20px;
+        }
+        
+        .sidebar .header h2 {
+            color: white;
+            font-size: 1.5rem;
+        }
+        
+        .sidebar ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        
+        .sidebar ul li {
+            padding: 0;
+        }
+        
+        .sidebar ul li a {
+            display: block;
+            padding: 12px 25px;
+            color: white;
+            text-decoration: none;
+            transition: 0.3s;
+        }
+        
+        .sidebar ul li a:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-left: 4px solid white;
+        }
+        
+        .sidebar ul li a.active {
+            background-color: rgba(255, 255, 255, 0.2);
+            border-left: 4px solid white;
+        }
+        
+        .sidebar .dropdown-btn {
+            padding: 12px 25px;
+            color: white;
+            background: none;
+            border: none;
+            width: 100%;
+            text-align: left;
+            cursor: pointer;
+            outline: none;
+            transition: 0.3s;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .sidebar .dropdown-btn:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-left: 4px solid white;
+        }
+        
+        .sidebar .dropdown-btn .arrow {
+            transition: transform 0.3s;
+        }
+        
+        .sidebar .dropdown-btn.active .arrow {
+            transform: rotate(180deg);
+        }
+        
+        .sidebar .dropdown-container {
+            display: none;
+            background-color: rgba(0, 0, 0, 0.1);
+            padding-left: 8px;
+        }
+        
+        .sidebar .dropdown-container a {
+            padding: 10px 25px 10px 40px;
+        }
+        
+        /* Main content styles */
+        .main-content {
+            margin-left: 260px;
+            padding: 20px;
+            transition: all 0.3s ease;
+            width: calc(100% - 260px);
+        }
+        
+        .content-section {
+            background: white;
+            padding: 30px;
+            margin-bottom: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .content-section h2 {
+            color: #0d6efd;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        
+        .content-section h3 {
+            color: #333;
+            margin: 20px 0 15px;
+        }
+        
+        .content-section p {
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+        
+        .content-section ul, .content-section ol {
+            margin-left: 20px;
+            margin-bottom: 15px;
+        }
+        
+        .content-section li {
+            margin-bottom: 8px;
+            line-height: 1.6;
+        }
+        
+        /* Toggle button for sidebar on small screens */
+        .sidebar-toggle {
+            display: none;
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background-color: #0d6efd;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 15px;
+            cursor: pointer;
+            z-index: 1001;
+        }
+        
+        /* Responsive styles */
+        @media screen and (max-width: 768px) {
+            .sidebar {
+                left: -260px;
+            }
+            
+            .sidebar.active {
+                left: 0;
+            }
+            
+            .main-content {
+                margin-left: 0;
+                width: 100%;
+            }
+            
+            .sidebar-toggle {
+                display: block;
+            }
+            
+            .main-content.sidebar-active {
+                margin-left: 260px;
+            }
+        }
+        
+        /* For very small screens */
+        @media screen and (max-width: 576px) {
+            .sidebar {
+                width: 100%;
+            }
+            
+            .main-content.sidebar-active {
+                margin-left: 0;
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="sidebar-toggle">☰ Menu</button>
+    
+    <div class="wrapper">
+        <!-- Sidebar -->
+        <nav class="sidebar">
+            <div class="header">
+                <h2>User Manual</h2>
+            </div>
+            <ul>
+                <li><a href="#introduction" class="active">Introduction</a></li>
+                <li><a href="#getting-started">Getting Started</a></li>
+                
+                <li>
+                    <button class="dropdown-btn">League Administrator Guide <span class="arrow">▼</span></button>
+                    <div class="dropdown-container">
+                        <a href="#league-admin">Overview</a>
+                        <a href="#team-management">Team Management</a>
+                        <a href="#player-management">Player Management</a>
+                        <a href="#stadium-management">Stadium Management</a>
+                        <a href="#match-management">Match Management</a>
+                        <a href="#score-updates">Score Updates</a>
+                        <a href="#points-table-admin">Points Table</a>
+                        <a href="#statistics-export-admin">Statistics Export</a>
+                    </div>
+                </li>
+                
+                <li>
+                    <button class="dropdown-btn">Team Manager Guide <span class="arrow">▼</span></button>
+                    <div class="dropdown-container">
+                        <a href="#team-manager">Overview</a>
+                        <a href="#team-details">Team Details</a>
+                        <a href="#player-management-1">Player Management</a>
+                        <a href="#team-statistics">Team Statistics</a>
+                        <a href="#exporting-statistics">Exporting Statistics</a>
+                    </div>
+                </li>
+                
+                <li>
+                    <button class="dropdown-btn">Player Guide <span class="arrow">▼</span></button>
+                    <div class="dropdown-container">
+                        <a href="#player-guide">Overview</a>
+                        <a href="#player-profile">Player Profile</a>
+                        <a href="#statistics-view">Statistics View</a>
+                        <a href="#match-history">Match History</a>
+                        <a href="#exporting-personal-statistics">Exporting Statistics</a>
+                    </div>
+                </li>
+                
+                <li>
+                    <button class="dropdown-btn">Referee Guide <span class="arrow">▼</span></button>
+                    <div class="dropdown-container">
+                        <a href="#referee-guide">Overview</a>
+                        <a href="#match-schedule">Match Schedule</a>
+                        <a href="#recording-match-events">Recording Match Events</a>
+                        <a href="#submitting-match-reports">Submitting Match Reports</a>
+                    </div>
+                </li>
+                
+                <li>
+                    <button class="dropdown-btn">Stadium Manager Guide <span class="arrow">▼</span></button>
+                    <div class="dropdown-container">
+                        <a href="#stadium-manager-guide">Overview</a>
+                        <a href="#stadium-details">Stadium Details</a>
+                        <a href="#match-schedule-at-stadium">Match Schedule</a>
+                    </div>
+                </li>
+                
+                <li>
+                    <button class="dropdown-btn">Common Features <span class="arrow">▼</span></button>
+                    <div class="dropdown-container">
+                        <a href="#common-features">Overview</a>
+                        <a href="#viewing-league-homepage">League Homepage</a>
+                        <a href="#upcoming-matches">Upcoming Matches</a>
+                        <a href="#past-matches">Past Matches</a>
+                        <a href="#points-table-1">Points Table</a>
+                        <a href="#teams-and-players-list">Teams & Players List</a>
+                    </div>
+                </li>
+                
+                <li><a href="#troubleshooting">Troubleshooting</a></li>
+            </ul>
+        </nav>
+        
+        <!-- Main Content -->
+        <div class="main-content">
+            <div id="introduction" class="content-section">
+                <h2>Introduction</h2>
+                <p>Welcome to the Football League Management System, a comprehensive platform designed to streamline the management of football leagues. This system allows for efficient organization of teams, players, stadiums, and matches while providing real-time updates and statistics.</p>
+                <p>Our system automates many manual processes, including rankings, tables, and statistics calculations, ensuring accuracy and saving time for all users. Whether you're a league administrator, team manager, player, referee, or stadium manager, this manual will guide you through all the features available to you.</p>
+            </div>
+            
+            <div id="getting-started" class="content-section">
+                <h2>Getting Started</h2>
+                <h3>Registration</h3>
+                <p>To use the Football League Management System, you need to create an account:</p>
+                <ol>
+                    <li>Navigate to the registration page by clicking "Register" in the navigation bar</li>
+                    <li>Fill in the required information:
+                        <ul>
+                            <li>Username</li>
+                            <li>Email address</li>
+                            <li>Password</li>
+                            <li>Select your role (Player, Team Manager, Referee, Stadium Manager)</li>
+                        </ul>
+                        <p>Note: League Administrator accounts can only be created by existing administrators</p>
+                    </li>
+                    <li>Click "Register" to create your account</li>
+                    <li>Verify your email address by clicking the link sent to your email</li>
+                </ol>
+                
+                <h3>Login</h3>
+                <p>Once registered, you can log in to access your dashboard:</p>
+                <ol>
+                    <li>Click "Login" in the navigation bar</li>
+                    <li>Enter your username and password</li>
+                    <li>Click "Login" to access your account</li>
+                </ol>
+                
+                <h3>Dashboard Overview</h3>
+                <p>After logging in, you'll be directed to your dashboard, which serves as your central hub:</p>
+                <ul>
+                    <li>Welcome message displaying your name</li>
+                    <li>Your role in the system</li>
+                    <li>Email address</li>
+                    <li>Quick links section with role-specific options</li>
+                    <li>Link to the User Manual (this document)</li>
+                    <li>Link to the League Homepage</li>
+                </ul>
+            </div>
+            
+            <div id="league-admin" class="content-section">
+                <h2>League Administrator Guide</h2>
+                <p>As a League Administrator, you have access to all aspects of the system and are responsible for setting up and managing the league.</p>
+                
+                <div id="team-management">
+                    <h3>Team Management</h3>
+                    <p>To manage teams in the league:</p>
+                    <ol>
+                        <li>Navigate to the Admin Panel from your dashboard</li>
+                        <li>Click on the "Teams" tab</li>
+                        <li><strong>Creating a Team</strong>:
+                            <ul>
+                                <li>Fill in the team name</li>
+                                <li>Select a team manager from the dropdown</li>
+                                <li>Choose a formation (e.g., 4-4-2, 4-3-3)</li>
+                                <li>Select a strategy (e.g., Attacking, Defensive)</li>
+                                <li>Click "Create Team"</li>
+                            </ul>
+                        </li>
+                        <li><strong>Viewing Teams</strong>:
+                            <ul>
+                                <li>All teams are displayed in a table showing ID, Name, Formation, and Strategy</li>
+                                <li>Use this list to keep track of all teams in the league</li>
+                            </ul>
+                        </li>
+                    </ol>
+                </div>
+                
+                <div id="player-management">
+                    <h3>Player Management</h3>
+                    <p>To manage players in the league:</p>
+                    <ol>
+                        <li>Navigate to the Admin Panel</li>
+                        <li>Click on the "Players" tab</li>
+                        <li><strong>Creating a Player</strong>:
+                            <ul>
+                                <li>Select a user with the 'player' role who doesn't already have a player profile</li>
+                                <li>Optionally assign them to a team</li>
+                                <li>Select their position (Goalkeeper, Defender, Midfielder, Forward)</li>
+                                <li>Enter their age, height, and weight</li>
+                                <li>Click "Create Player"</li>
+                            </ul>
+                        </li>
+                        <li><strong>Viewing Players</strong>:
+                            <ul>
+                                <li>All players are displayed in a table showing ID, Name, Position, and Team</li>
+                                <li>Use this list to keep track of all players in the league</li>
+                            </ul>
+                        </li>
+                    </ol>
+                </div>
+                
+                <div id="stadium-management">
+                    <h3>Stadium Management</h3>
+                    <p>To manage stadiums in the league:</p>
+                    <ol>
+                        <li>Navigate to the Admin Panel</li>
+                        <li>Click on the "Stadiums" tab</li>
+                        <li><strong>Creating a Stadium</strong>:
+                            <ul>
+                                <li>Enter the stadium name</li>
+                                <li>Provide the location</li>
+                                <li>Specify the capacity</li>
+                                <li>Select a stadium manager</li>
+                                <li>Click "Create Stadium"</li>
+                            </ul>
+                        </li>
+                        <li><strong>Viewing Stadiums</strong>:
+                            <ul>
+                                <li>All stadiums are displayed in a table showing ID, Name, Location, and Capacity</li>
+                                <li>Use this list to keep track of all stadiums in the league</li>
+                            </ul>
+                        </li>
+                    </ol>
+                </div>
+                
+                <div id="match-management">
+                    <h3>Match Management</h3>
+                    <p>To manage matches in the league:</p>
+                    <ol>
+                        <li>Navigate to the Admin Panel</li>
+                        <li>Click on the "Matches" tab</li>
+                        <li><strong>Creating a Match</strong>:
+                            <ul>
+                                <li>Select home and away teams</li>
+                                <li>Choose a stadium</li>
+                                <li>Assign a referee</li>
+                                <li>Set the match date and time</li>
+                                <li>Click "Create Match"</li>
+                            </ul>
+                        </li>
+                        <li><strong>Viewing Matches</strong>:
+                            <ul>
+                                <li>All matches are displayed in a table showing Teams, Date, Status, and Score</li>
+                                <li>Use this list to keep track of all matches in the league</li>
+                            </ul>
+                        </li>
+                    </ol>
+                </div>
+                
+                <div id="score-updates">
+                    <h3>Score Updates</h3>
+                    <p>To update match scores:</p>
+                    <ol>
+                        <li>Navigate to the Admin Panel</li>
+                        <li>Click on the "Update Scores" tab</li>
+                        <li><strong>Updating a Score</strong>:
+                            <ul>
+                                <li>Select a match from the dropdown (only non-completed matches are shown)</li>
+                                <li>Enter the home score</li>
+                                <li>Enter the away score</li>
+                                <li>Click "Update Score"</li>
+                            </ul>
+                        </li>
+                        <li><strong>Viewing Completed Matches</strong>:
+                            <ul>
+                                <li>All completed matches are displayed with their final scores</li>
+                                <li>The system automatically updates the points table based on these results</li>
+                            </ul>
+                        </li>
+                    </ol>
+                </div>
+                
+                <div id="points-table-admin">
+                    <h3>Points Table</h3>
+                    <p>The points table is automatically calculated based on match results:</p>
+                    <ul>
+                        <li>Teams are ranked by points (3 for a win, 1 for a draw)</li>
+                        <li>In case of equal points, teams are ranked by goal difference</li>
+                        <li>If goal difference is equal, teams are ranked by goals scored</li>
+                    </ul>
+                </div>
+                
+                <div id="statistics-export-admin">
+                    <h3>Statistics Export</h3>
+                    <p>You can export league statistics for reporting:</p>
+                    <ol>
+                        <li>Navigate to the Team Statistics or Player Statistics pages</li>
+                        <li>Click the "Export as PDF" button</li>
+                        <li>The system will generate a comprehensive PDF report with all statistics</li>
+                    </ol>
+                </div>
+            </div>
+            
+            <div id="team-manager" class="content-section">
+                <h2>Team Manager Guide</h2>
+                <p>As a Team Manager, you're responsible for managing your team's details and players.</p>
+                
+                <div id="team-details">
+                    <h3>Team Details</h3>
+                    <p>To manage your team's details:</p>
+                    <ol>
+                        <li>Navigate to Team Management from your dashboard</li>
+                        <li>Click on the "Team Details" tab</li>
+                        <li><strong>Updating Team Information</strong>:
+                            <ul>
+                                <li>Edit the team name</li>
+                                <li>Select a formation</li>
+                                <li>Choose a strategy</li>
+                                <li>Click "Update Team"</li>
+                            </ul>
+                        </li>
+                    </ol>
+                </div>
+                
+                <div id="player-management-1">
+                    <h3>Player Management</h3>
+                    <p>To manage your team's players:</p>
+                    <ol>
+                        <li>Navigate to Team Management</li>
+                        <li>Click on the "Players" tab</li>
+                        <li><strong>Adding Players to Your Team</strong>:
+                            <ul>
+                                <li>View the list of available players</li>
+                                <li>Click "Add to Team" next to a player to add them to your team</li>
+                            </ul>
+                        </li>
+                        <li><strong>Removing Players from Your Team</strong>:
+                            <ul>
+                                <li>View your current team players</li>
+                                <li>Click "Remove" next to a player to remove them from your team</li>
+                            </ul>
+                        </li>
+                    </ol>
+                </div>
+                
+                <div id="team-statistics">
+                    <h3>Team Statistics</h3>
+                    <p>To view your team's statistics:</p>
+                    <ol>
+                        <li>Navigate to Team Management</li>
+                        <li>Click on the "Team Statistics" tab</li>
+                        <li><strong>Viewing Statistics</strong>:
+                            <ul>
+                                <li>Summary tab: Overall performance metrics (matches played, win rate, points)</li>
+                                <li>Match History tab: Detailed list of all matches played</li>
+                                <li>Form Analysis tab: Recent form and performance trends</li>
+                            </ul>
+                        </li>
+                    </ol>
+                </div>
+                
+                <div id="exporting-statistics">
+                    <h3>Exporting Statistics</h3>
+                    <p>To export your team's statistics:</p>
+                    <ol>
+                        <li>Navigate to Team Management</li>
+                        <li>Click on the "Team Statistics" tab</li>
+                        <li>Click the "Export as PDF" button</li>
+                        <li>The system will generate a comprehensive PDF report with all your team's statistics</li>
+                    </ol>
+                </div>
+            </div>
+            
+            <!-- Player Guide Section -->
+            <div id="player-guide" class="content-section">
+                <h2>Player Guide</h2>
+                <p>As a Player, you can view and update your profile and statistics.</p>
+                
+                <div id="player-profile">
+                    <h3>Player Profile</h3>
+                    <p>To manage your player profile:</p>
+                    <ol>
+                        <li>Navigate to Player Profile from your dashboard</li>
+                        <li>Click on the "My Profile" tab</li>
+                        <li><strong>Updating Your Profile</strong>:
+                            <ul>
+                                <li>Edit your full name</li>
+                                <li>Select your position</li>
+                                <li>Update your age, height, and weight</li>
+                                <li>Click "Update Profile"</li>
+                            </ul>
+                        </li>
+                    </ol>
+                </div>
+                
+                <div id="statistics-view">
+                    <h3>Statistics View</h3>
+                    <p>To view your statistics:</p>
+                    <ol>
+                        <li>Navigate to Player Profile</li>
+                        <li>Click on the "My Statistics" tab</li>
+                        <li><strong>Viewing Statistics</strong>:
+                            <ul>
+                                <li>Summary tab: Overall performance metrics (matches played, win rate)</li>
+                                <li>Match History tab: Detailed list of all matches you've played in</li>
+                                <li>Form Analysis tab: Recent form and performance trends</li>
+                            </ul>
+                        </li>
+                    </ol>
+                </div>
+                
+                <div id="match-history">
+                    <h3>Match History</h3>
+                    <p>The Match History tab shows all matches you've participated in, including:</p>
+                    <ul>
+                        <li>Date</li>
+                        <li>Match (teams involved)</li>
+                        <li>Venue (home/away)</li>
+                        <li>Result (win/draw/loss)</li>
+                        <li>Score</li>
+                        <li>Stadium</li>
+                    </ul>
+                </div>
+                
+                <div id="exporting-personal-statistics">
+                    <h3>Exporting Personal Statistics</h3>
+                    <p>To export your personal statistics:</p>
+                    <ol>
+                        <li>Navigate to Player Profile</li>
+                        <li>Click on the "My Statistics" tab</li>
+                        <li>Click the "Export as PDF" button</li>
+                        <li>The system will generate a comprehensive PDF report with all your statistics</li>
+                    </ol>
+                </div>
+            </div>
+            
+            <!-- Referee Guide Section -->
+            <div id="referee-guide" class="content-section">
+                <h2>Referee Guide</h2>
+                <p>As a Referee, you can view your match schedule and record match events.</p>
+                
+                <div id="match-schedule">
+                    <h3>Match Schedule</h3>
+                    <p>To view your assigned matches:</p>
+                    <ol>
+                        <li>Navigate to Referee Schedule from your dashboard</li>
+                        <li><strong>Upcoming Matches</strong>:
+                            <ul>
+                                <li>View details of matches you're assigned to referee</li>
+                                <li>See date, time, teams, and stadium information</li>
+                            </ul>
+                        </li>
+                    </ol>
+                </div>
+                
+                <div id="recording-match-events">
+                    <h3>Recording Match Events</h3>
+                    <p>During matches, you can record key events:</p>
+                    <ol>
+                        <li>Access the match details page</li>
+                        <li>Record goals, assists, yellow cards, and red cards</li>
+                        <li>Update the match status (in progress, halftime, completed)</li>
+                    </ol>
+                </div>
+                
+                <div id="submitting-match-reports">
+                    <h3>Submitting Match Reports</h3>
+                    <p>After a match:</p>
+                    <ol>
+                        <li>Enter the final score</li>
+                        <li>Review all recorded events</li>
+                        <li>Add any additional notes</li>
+                        <li>Submit the match report</li>
+                        <li>Once submitted, the system automatically updates the league standings</li>
+                    </ol>
+                </div>
+            </div>
+            
+            <!-- Stadium Manager Guide Section -->
+            <div id="stadium-manager-guide" class="content-section">
+                <h2>Stadium Manager Guide</h2>
+                <p>As a Stadium Manager, you can manage your stadium's details and view the match schedule.</p>
+                
+                <div id="stadium-details">
+                    <h3>Stadium Details</h3>
+                    <p>To manage your stadium:</p>
+                    <ol>
+                        <li>Navigate to Stadium Management from your dashboard</li>
+                        <li><strong>Viewing Stadium Information</strong>:
+                            <ul>
+                                <li>See stadium name, location, and capacity</li>
+                                <li>View any upcoming maintenance schedules</li>
+                            </ul>
+                        </li>
+                    </ol>
+                </div>
+                
+                <div id="match-schedule-at-stadium">
+                    <h3>Match Schedule at Stadium</h3>
+                    <p>To view matches at your stadium:</p>
+                    <ol>
+                        <li>Navigate to Stadium Management</li>
+                        <li>View the calendar of scheduled matches</li>
+                        <li>See details including date, time, and teams</li>
+                    </ol>
+                </div>
+            </div>
+            
+            <!-- Common Features Section -->
+            <div id="common-features" class="content-section">
+                <h2>Common Features</h2>
+                <p>These features are available to all users regardless of role.</p>
+                
+                <div id="viewing-league-homepage">
+                    <h3>Viewing League Homepage</h3>
+                    <p>The League Homepage provides an overview of the league:</p>
+                    <ol>
+                        <li>Click "View League Homepage" from your dashboard or the navigation bar</li>
+                        <li><strong>Homepage Features</strong>:
+                            <ul>
+                                <li>Upcoming matches</li>
+                                <li>Past matches</li>
+                                <li>Points table</li>
+                                <li>Teams and players information</li>
+                            </ul>
+                        </li>
+                    </ol>
+                </div>
+                
+                <div id="upcoming-matches">
+                    <h3>Upcoming Matches</h3>
+                    <p>To view upcoming matches:</p>
+                    <ol>
+                        <li>Navigate to the League Homepage</li>
+                        <li>Click on the "Upcoming Matches" tab</li>
+                        <li>View details of all scheduled matches including date, time, teams, and venue</li>
+                    </ol>
+                </div>
+                
+                <div id="past-matches">
+                    <h3>Past Matches</h3>
+                    <p>To view past matches:</p>
+                    <ol>
+                        <li>Navigate to the League Homepage</li>
+                        <li>Click on the "Past Matches" tab</li>
+                        <li>View results of completed matches including scores and match details</li>
+                    </ol>
+                </div>
+                
+                <div id="points-table-1">
+                    <h3>Points Table</h3>
+                    <p>To view the league standings:</p>
+                    <ol>
+                        <li>Navigate to the League Homepage</li>
+                        <li>Click on the "Points Table" tab</li>
+                        <li>View the current standings with points, wins, draws, losses, and goal differences</li>
+                    </ol>
+                </div>
+                
+                <div id="teams-and-players-list">
+                    <h3>Teams and Players List</h3>
+                    <p>To view teams and players:</p>
+                    <ol>
+                        <li>Navigate to the League Homepage</li>
+                        <li>See the list of teams in the league on the right sidebar</li>
+                        <li>Below the teams, view a list of top players in the league</li>
+                    </ol>
+                </div>
+            </div>
+            
+            <!-- Troubleshooting Section -->
+            <div id="troubleshooting" class="content-section">
+                <h2>Troubleshooting</h2>
+                
+                <h3>Common Issues</h3>
+                <p><strong>Login Problems</strong>:</p>
+                <ul>
+                    <li>Ensure you're using the correct username and password</li>
+                    <li>Check if Caps Lock is enabled</li>
+                    <li>Try resetting your password using the "Forgot Password" link</li>
+                </ul>
+                
+                <p><strong>Data Not Displaying</strong>:</p>
+                <ul>
+                    <li>Refresh the page</li>
+                    <li>Check your internet connection</li>
+                    <li>Clear your browser cache</li>
+                    <li>Try logging out and logging back in</li>
+                </ul>
+                
+                <p><strong>Form Submission Errors</strong>:</p>
+                <ul>
+                    <li>Ensure all required fields are filled</li>
+                    <li>Check for any validation errors highlighted in red</li>
+                    <li>Try using a different browser</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // JavaScript for sidebar functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            // Toggle sidebar on mobile
+            const sidebarToggle = document.querySelector('.sidebar-toggle');
+            const sidebar = document.querySelector('.sidebar');
+            const mainContent = document.querySelector('.main-content');
+            
+            sidebarToggle.addEventListener('click', function() {
+                sidebar.classList.toggle('active');
+                mainContent.classList.toggle('sidebar-active');
+            });
+            
+            // Dropdown functionality
+            const dropdownBtns = document.querySelectorAll('.dropdown-btn');
+            
+            dropdownBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    this.classList.toggle('active');
+                    const dropdownContent = this.nextElementSibling;
+                    if (dropdownContent.style.display === 'block') {
+                        dropdownContent.style.display = 'none';
+                    } else {
+                        dropdownContent.style.display = 'block';
+                    }
+                });
+            });
+            
+            // Smooth scrolling for anchor links
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    // Close sidebar on mobile when clicking a link
+                    if (window.innerWidth <= 768) {
+                        sidebar.classList.remove('active');
+                        mainContent.classList.remove('sidebar-active');
+                    }
+                    
+                    // Remove active class from all links
+                    document.querySelectorAll('.sidebar a').forEach(a => {
+                        a.classList.remove('active');
+                    });
+                    
+                    // Add active class to clicked link
+                    this.classList.add('active');
+                    
+                    // Scroll to section
+                    document.querySelector(this.getAttribute('href')).scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                });
+            });
+            
+            // Set active link based on scroll position
+            window.addEventListener('scroll', function() {
+                const scrollPosition = window.scrollY;
+                
+                document.querySelectorAll('.content-section').forEach(section => {
+                    const sectionTop = section.offsetTop - 100;
+                    const sectionBottom = sectionTop + section.offsetHeight;
+                    const sectionId = section.getAttribute('id');
+                    
+                    if (scrollPosition >= sectionTop && scrollPosition < sectionBottom) {
+                        document.querySelectorAll('.sidebar a').forEach(a => {
+                            a.classList.remove('active');
+                            if (a.getAttribute('href') === `#${sectionId}`) {
+                                a.classList.add('active');
+                                
+                                // If link is in dropdown, open the dropdown
+                                const parentDropdown = a.closest('.dropdown-container');
+                                if (parentDropdown) {
+                                    parentDropdown.style.display = 'block';
+                                    parentDropdown.previousElementSibling.classList.add('active');
+                                }
+                            }
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
