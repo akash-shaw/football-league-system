@@ -19,6 +19,7 @@ function PlayerProfile() {
   const [activeSection, setActiveSection] = useState('profile');
 
   useEffect(() => {
+    document.title = "Player | Football League Management System";
     const fetchData = async () => {
       try {
         setLoading(true);

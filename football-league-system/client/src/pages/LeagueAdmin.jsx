@@ -29,6 +29,7 @@ function LeagueAdmin() {
   const [managers, setManagers] = useState([]);
 
   useEffect(() => {
+    document.title = "Admin | Football League Management System";
     const fetchData = async () => {
       try {
         setLoading(true);

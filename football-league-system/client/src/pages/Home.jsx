@@ -14,6 +14,7 @@ function Home() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
+    document.title = "Home | Football League Management System";
     const fetchData = async () => {
       try {
         setLoading(true);

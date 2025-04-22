@@ -8,6 +8,7 @@ function Dashboard({ user }) {
   const [error, setError] = useState(null);
 
   useEffect(() => {
+    document.title = "Dashboard | Football League Management System";
     const fetchProfile = async () => {
       try {
         setLoading(true);

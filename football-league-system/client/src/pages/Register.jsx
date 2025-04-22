@@ -1,8 +1,12 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { register } from '../services/api';
 
 function Register({ setUser }) {
+  useEffect(() => {
+    document.title = "Register | Football League Management System";
+  }, []);
+
   const [formData, setFormData] = useState({
     username: '',
     email: '',

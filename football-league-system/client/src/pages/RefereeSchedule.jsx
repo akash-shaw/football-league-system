@@ -10,6 +10,7 @@ function RefereeSchedule() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
+    document.title = "Referee | Football League Management System";
     const fetchMatches = async () => {
       try {
         setLoading(true);

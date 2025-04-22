@@ -20,6 +20,7 @@ function TeamManager() {
   const [activeSection, setActiveSection] = useState('team');
 
   useEffect(() => {
+    document.title = "Team Management | Football League Management System";
     const fetchTeams = async () => {
       try {
         setLoading(true);

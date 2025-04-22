@@ -15,6 +15,7 @@ function StadiumManager() {
   const [success, setSuccess] = useState(null);
 
   useEffect(() => {
+    document.title = "Stadium Management | Football League Management System";
     const fetchStadiums = async () => {
       try {
         setLoading(true);
