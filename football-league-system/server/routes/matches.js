@@ -95,6 +95,27 @@ router.post('/', auth, checkRole(['league_admin']), async (req, res) => {
   try {
     const { home_team_id, away_team_id, stadium_id, referee_id, match_date } = req.body;
     
+    // Check if stadium is already booked at the requested time
+    // Assuming a match lasts 2 hours, check for conflicts within that window
+    const matchDateTime = new Date(match_date);
+    const matchEndTime = new Date(matchDateTime);
+    matchEndTime.setHours(matchEndTime.getHours() + 2);
+    
+    const conflictingMatches = await pool.query(
+      `SELECT * FROM matches 
+       WHERE stadium_id = $1 
+       AND match_date < $2 
+       AND (match_date + INTERVAL '2 hours') > $3`,
+      [stadium_id, matchEndTime, matchDateTime]
+    );
+    
+    if (conflictingMatches.rows.length > 0) {
+      return res.status(400).json({ 
+        message: 'Stadium already booked at this time. Please choose a different time or stadium.' 
+      });
+    }
+    
+    // If no conflicts, create the match
     const newMatch = await pool.query(
       'INSERT INTO matches (home_team_id, away_team_id, stadium_id, referee_id, match_date) ' +
       'VALUES ($1, $2, $3, $4, $5) RETURNING *',
