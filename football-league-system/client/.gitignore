@@ -22,3 +22,17 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+
+# Local config
+.env
+.vitepress/cache/
+.vite/*
+.DS_Store
+
+# IDE/Editor specific
+.idea/
+*.swp
+
+# Optional: Mac/Linux file thumbnails
+Thumbs.db
